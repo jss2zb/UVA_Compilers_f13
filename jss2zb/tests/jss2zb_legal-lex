@@ -1,1 +1,11 @@
-GO
+BEGIN;
+GO 90;
+TURN 23.3;
+VAR myVar = 29.3004;
+STEP myVar;
+JUMP myVar;
+FOR (myVar < 35)
+    myVar = myVar + 1;
+DO sin(90) + cos(90) + sqrt(3.14)
+TO DO + - * /
+
