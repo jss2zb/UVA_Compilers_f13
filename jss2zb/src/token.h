@@ -24,8 +24,15 @@
 #define OPEN 279
 #define CLOSE 280
 #define ASSIGN 281
-
-
+#define IF 282
+#define ELSE 283
+#define PROCEDURE 284
+#define WHILE 285
+#define THEN 286
+#define GREATERTHAN 287
+#define LESSTHAN 288
+#define COMMA 289
+#define RETURN 290
 
 typedef union YYSTYPE
 { int i; node *n; double d;}
