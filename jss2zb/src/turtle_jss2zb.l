@@ -26,9 +26,8 @@ IF              return IF;
 ELSE            return ELSE;
 THEN            return THEN;
 WHILE           return WHILE;
-
-
 PROCEDURE       return PROCEDURE;
+RETURN          return RETURN;
 
 sin             return SIN;
 cos             return COS;
@@ -45,6 +44,7 @@ sqrt            return SQRT;
 \<              return LESSTHAN;
 \,              return COMMA;
 =               return ASSIGN;
+
 
 {IDs}              { yylval.n = lookup(yytext); 
                         if (yylval.n==NULL)

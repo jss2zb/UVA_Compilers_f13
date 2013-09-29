@@ -26,16 +26,23 @@
 #define ASSIGN 281
 #define IF 282
 #define ELSE 283
-#define PROCEDURE 284
+#define THEN 284
 #define WHILE 285
-#define THEN 286
-#define GREATERTHAN 287
-#define LESSTHAN 288
-#define COMMA 289
-#define RETURN 290
+#define PROCEDURE 286
+#define PCALL 287
+#define PARAM 288
+#define LESSTHAN 289
+#define GREATERTHAN 290
+#define LESSTHANEQUAL 291
+#define GREATERTHANEQUAL 292
+#define EQUALS 293
+#define NOTEQUALS 294
+#define CURLOPEN 295
+#define CURLCLOSE 296
+
 
 typedef union YYSTYPE
 { int i; node *n; double d;}
         YYSTYPE;
-YYSTYPE yylval;
+extern YYSTYPE yylval;
 
