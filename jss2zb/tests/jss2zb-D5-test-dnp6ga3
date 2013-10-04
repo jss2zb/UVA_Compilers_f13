@@ -1,8 +1,8 @@
-
 VAR myvar;
 VAR othervar;
 VAR anothervar;
 VAR pi;
+VAR index;
 
 pi = 3.14;
 myvar = 27 / sqrt(9) + 10 * sin(pi);
@@ -23,3 +23,11 @@ myvar = 22-pi;
 JUMP myvar;
 END
 
+IF(othervar == 12.45) 
+     GO myvar
+   ELSE
+    GO dist;
+    
+
+
+ 

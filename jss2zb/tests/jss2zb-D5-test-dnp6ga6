@@ -2,6 +2,7 @@ VAR myvar;
 VAR othervar;
 VAR anothervar;
 VAR pi;
+VAR index;
 
 pi = 3.14;
 myvar = 27 / sqrt(9) + 10 * sin(pi);
@@ -11,16 +12,25 @@ GO 27-7+myvar;
 JUMP 10*(2/5)+24;
 TURN othervar;
 
-FOR index = 1 
-    STEP 1 
+FOR index = -1 
+    STEP +1 
     TO 90-1 
     DO 
        GO index;
-
-21 = myvar
 
 BEGIN
 myvar = 22-pi;
 JUMP myvar;
 END
 
+index = 0;
+
+WHILE(index<10)
+{
+JUMP 270;
+TURN index + 3;
+index=index+1;
+}
+
+WHILE(index>=0)
+    JUMP 270;

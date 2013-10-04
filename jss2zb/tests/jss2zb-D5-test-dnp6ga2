@@ -1,0 +1,34 @@
+VAR myvar;
+VAR othervar;
+VAR anothervar;
+VAR pi;
+VAR index;
+
+pi = 3.14;
+myvar = 27 / sqrt(9) + 10 * sin(pi);
+othervar = 10 - cos(pi/2);
+
+GO 27-7+myvar;
+JUMP 10*(2/5)+24;
+TURN othervar;
+
+FOR index = -1 
+    STEP +1 
+    TO 90-1 
+    DO 
+       GO index;
+
+BEGIN
+myvar = 22-pi;
+JUMP myvar;
+END
+
+PROCEDURE bettera()
+{
+  FOR index = 3
+     STEP 5
+     TO 90
+     DO
+       TURN index;
+       GO index;
+}
