@@ -1,0 +1,19 @@
+fullprog.syn	Full Legal syntax with all structures 		FAILS with sytax error 
+-----------------------------------------------------
+if1.syn		Simple if syntax				FAILS
+if2.syn		nested if					FAILS
+if3.syn		complicated if interactions			PASSES
+-----------------------------------------------------
+ill0.syn	illegal cases from previous			FAILS
+ill1.syn							FAILS
+ill2.syn							FAILS
+-----------------------------------------------------	
+keywords1.syn	legal case from previous			PASSES
+-----------------------------------------------------
+proc1.syn	simple procedure calls				PASSES
+proc2.syn	procedures calling each other			FAILS
+proc3.syn	recursion					PASSES
+-----------------------------------------------------
+while1.syn	simple while					PASSES
+while2.syn	nested whiles					PASSES
+while3.syn	complex while structures			FAILS
