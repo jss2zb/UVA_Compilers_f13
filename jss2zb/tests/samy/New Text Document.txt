@@ -1,6 +1,6 @@
 fullprog.syn	Full Legal syntax with all structures 		FAILS with sytax error 
 -----------------------------------------------------
-if1.syn		Simple if syntax				FAILS
+if1.syn		Simple if syntax				PASSES
 if2.syn		nested if					FAILS
 if3.syn		complicated if interactions			PASSES
 -----------------------------------------------------
@@ -16,4 +16,4 @@ proc3.syn	recursion					PASSES
 -----------------------------------------------------
 while1.syn	simple while					PASSES
 while2.syn	nested whiles					PASSES
-while3.syn	complex while structures			FAILS
+while3.syn	complex while structures			PASSES
