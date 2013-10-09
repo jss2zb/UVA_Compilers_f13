@@ -16,12 +16,18 @@ IF(abc>=0) {
     //abc=abc-1;
     //GO 80;
 }
+
 //If Else
+
 IF(1)
-{GO 10;}
+{
+GO 10;
+}
 ELSE
-{JUMP 10;
-GO 10;}
+{
+JUMP 10;
+GO 10;
+}
 
 //If then else
 IF(abc>=0)

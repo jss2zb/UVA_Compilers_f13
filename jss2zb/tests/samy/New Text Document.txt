@@ -11,7 +11,7 @@ ill2.syn							FAILS
 keywords1.syn	legal case from previous			PASSES
 -----------------------------------------------------
 proc1.syn	simple procedure calls				PASSES
-proc2.syn	procedures calling each other			FAILS
+proc2.syn	procedures calling each other			PASSES (Must use '(' ')' around exprs
 proc3.syn	recursion					PASSES
 -----------------------------------------------------
 while1.syn	simple while					PASSES

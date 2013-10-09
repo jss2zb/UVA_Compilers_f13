@@ -27,7 +27,7 @@ CALL space;
 CALL abc 10;
 CALL space;
 CALL abc 5;
-CALL abc -2;//shouldn't draw anything but valid call
+CALL abc (-2);//shouldn't draw anything but valid call
 CALL space 10 20 30;//space accepts no arguments
 CALL abc;//null argument to abc which accepts arguments
 CALL space;
@@ -37,5 +37,5 @@ q=4;
 r=2;
 CALL space;
 CALL abc (sqrt(sin p* sin p+ cos p* cos p)*1 +1);
-CALL space (1);
+CALL space (1) (-1) (sin(64 * 2));
 CALL abc (3*(2+(sqrt(cos(sin 90)/2)/3))+1.0);

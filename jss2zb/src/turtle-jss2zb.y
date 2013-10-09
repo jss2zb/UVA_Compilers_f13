@@ -53,7 +53,7 @@ stmt: FOR ID ASSIGN expr
 
 stmt: COPEN stmtlist CCLOSE; 
 
-stmt: PCALL ID params SEMICOLON {printf("%s",$2->symbol);};	 
+stmt: PCALL ID params SEMICOLON {printf("proc%s\n",$2->symbol);};	 
  
 stmt: IFBLOCK {printf(" if\n");};
 stmt: IFBLOCK ELSEBLOCK;
