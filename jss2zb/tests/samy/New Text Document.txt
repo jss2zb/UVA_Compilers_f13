@@ -1,7 +1,7 @@
 fullprog.syn	Full Legal syntax with all structures 		FAILS with sytax error 
 -----------------------------------------------------
 if1.syn		Simple if syntax				PASSES
-if2.syn		nested if					FAILS
+if2.syn		nested if					PASSES
 if3.syn		complicated if interactions			PASSES
 -----------------------------------------------------
 ill0.syn	illegal cases from previous			FAILS

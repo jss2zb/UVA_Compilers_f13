@@ -58,8 +58,6 @@ stmt: PCALL ID params SEMICOLON {printf("proc%s\n",$2->symbol);};
 params: params atomic;
 params: ;
 
-stmt: IFBLOCK {printf(" if\n");};
-
 stmt: WHILE {printf("\n{ ");} 
           comparator {printf("{} {exit} ifelse\n");}
           whileStatements {printf("} loop\n");};
@@ -70,20 +68,25 @@ whileStatements: stmt;
 stmt: PROCEDURE ID {printf("/proc%s {",$2->symbol);} 
           CURLOPEN stmtlist CURLCLOSE {printf("} def\n");};
 
-//IFBLOCK:  IF comparator then whileStatements ELSE whileStatements;
-//IFBLOCK: IF comparator then CURLOPEN {printf("\n{");} stmtlist CURLCLOSE {printf("}");} ELSEBLOCK;
-//IFBLOCK: IF comparator then {printf("\n{");} stmt {printf("}");} ELSEBLOCK;
-IFBLOCK: IF comparator then ELSEBLOCK;
-comparator: OPEN compare CLOSE;
+
+stmt: IFBLOCK {printf(" if\n");};
+
+
+IFBLOCK: IF comparator then 
+	 CURLOPEN {printf("\n{");} stmtlist CURLCLOSE {printf("}");} 
+	 ELSEBLOCK;
+IFBLOCK: IF comparator then  {printf("\n{");} stmt {printf("}");}; 
 
 then: THEN;
 then: ;
 
 ELSEBLOCK: ;
-//ELSEBLOCK: whileStatements ELSE whileStatements;
-//ELSEBLOCK: whileStatements;
+ELSEBLOCK: ELSE stmt;
+ELSEBLOCK: ELSE CURLOPEN {printf("\n{");} stmtlist CURLCLOSE {printf("}");};
 
 
+
+comparator: OPEN compare CLOSE;
 compare: expr EQUALS expr {printf("eq ");};
 compare: expr NOTEQUALS expr {printf("ne ");};
 compare: expr GREATERTHAN expr {printf("gt ");};

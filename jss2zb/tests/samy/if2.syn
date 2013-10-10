@@ -27,7 +27,7 @@ ELSE
 GO 50;
 
 IF(p<0)
-THEN GO 60;
+THEN {GO 60;}
 ELSE {TURN 90; GO 60;}
 
 
