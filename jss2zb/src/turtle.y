@@ -75,6 +75,7 @@ stmt: IFBLOCK {printf(" if\n");};
 IFBLOCK: IF comparator then 
 	 CURLOPEN {printf("\n{");} stmtlist CURLCLOSE {printf("}");} 
 	 ELSEBLOCK;
+
 IFBLOCK: IF comparator then  {printf("\n{");} stmt {printf("}");}; 
 
 then: THEN;
