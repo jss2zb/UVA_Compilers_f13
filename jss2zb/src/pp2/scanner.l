@@ -11,6 +11,7 @@
 #include "errors.h"
 #include "parser.h" // for token codes, yylval
 #include "list.h"
+#include "stdio.h"
 
 #define TAB_SIZE 8
 
@@ -51,7 +52,7 @@ DOUBLE            ({INTEGER}"."{DIGIT}*{EXPONENT}?)
 BEG_STRING        (\"[^"\n]*)
 STRING            ({BEG_STRING}\")
 IDENTIFIER        ([a-zA-Z][a-zA-Z_0-9]*)
-OPERATOR          ([-+/*%=.,;!<>()[\]{}])
+OPERATOR          ([-+/*%.,=;!<>()[\]{}])
 BEG_COMMENT       ("/*")
 END_COMMENT       ("*/")
 SINGLE_COMMENT    ("//"[^\n]*)
@@ -102,6 +103,9 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "Print"             { return T_Print;       }
 "ReadInteger"       { return T_ReadInteger; }
 "ReadLine"          { return T_ReadLine;    }
+"switch"            { return J_Switch;      }
+"case"              { return J_Case;        }
+"default"           { return J_Default;     }
 
 
 
@@ -112,6 +116,8 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "!="                { return T_NotEqual;    }
 "&&"                { return T_And;         }
 "||"                { return T_Or;          }
+
+":"                 { return yytext[0];     }
 {OPERATOR}          { return yytext[0];     }
     
 "[]"                { return T_Dims;        }

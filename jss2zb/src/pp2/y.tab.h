@@ -66,13 +66,15 @@
      T_Print = 284,
      T_ReadInteger = 285,
      T_ReadLine = 286,
-     T_Identifier = 287,
-     T_StringConstant = 288,
-     T_IntConstant = 289,
-     T_DoubleConstant = 290,
-     T_BoolConstant = 291,
-     NOT = 292,
-     THEN = 293
+     J_Switch = 287,
+     J_Case = 288,
+     J_Default = 289,
+     T_Identifier = 290,
+     T_StringConstant = 291,
+     T_IntConstant = 292,
+     T_DoubleConstant = 293,
+     T_BoolConstant = 294,
+     THEN = 295
    };
 #endif
 /* Tokens.  */
@@ -105,13 +107,15 @@
 #define T_Print 284
 #define T_ReadInteger 285
 #define T_ReadLine 286
-#define T_Identifier 287
-#define T_StringConstant 288
-#define T_IntConstant 289
-#define T_DoubleConstant 290
-#define T_BoolConstant 291
-#define NOT 292
-#define THEN 293
+#define J_Switch 287
+#define J_Case 288
+#define J_Default 289
+#define T_Identifier 290
+#define T_StringConstant 291
+#define T_IntConstant 292
+#define T_DoubleConstant 293
+#define T_BoolConstant 294
+#define THEN 295
 
 
 
@@ -136,6 +140,8 @@ typedef union YYSTYPE
     Type *type;
     Stmt *stmt;
     NamedType *named;
+    Expr *expr;
+    List<Expr*> *exprList;
     List<NamedType*> *namedList;
     List<Stmt*> *stmtList;
     List<VarDecl*> *varList;
@@ -144,7 +150,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 148 "y.tab.h"
+#line 154 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

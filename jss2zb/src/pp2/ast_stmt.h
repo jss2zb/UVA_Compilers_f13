@@ -58,14 +58,13 @@ class ConditionalStmt : public Stmt
     Stmt *body;
   
   public:
-    ConditionalStmt(Expr *testExpr, Stmt *body);
+    ConditionalStmt(Expr *test, Stmt *body);
 };
 
 class LoopStmt : public ConditionalStmt 
 {
   public:
-    LoopStmt(Expr *testExpr, Stmt *body)
-            : ConditionalStmt(testExpr, body) {}
+    LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
 };
 
 class ForStmt : public LoopStmt 
@@ -86,6 +85,40 @@ class WhileStmt : public LoopStmt
     const char *GetPrintNameForNode() { return "WhileStmt"; }
     void PrintChildren(int indentLevel);
 };
+
+class SwitchStmt : public LoopStmt
+{
+ protected:
+   List<Stmt*> *cases;
+
+ public:
+   SwitchStmt(Expr *test, List<Stmt*> *cases, Stmt *body); 
+   const char *GetPrintNameForNode() { return "SwitchStmt";}
+   void PrintChildren(int indentLevel);
+};
+
+class CaseStmt : public Stmt
+{
+ protected:
+  Expr *test;
+  List<Stmt*> *body;
+
+ public: 
+  CaseStmt(Expr *test, List<Stmt*> *body);
+  const char *GetPrintNameForNode() { return "Case"; }
+  void PrintChildren(int indentLevel);
+};
+
+class DefaultStmt : public Stmt
+{
+ protected:
+  List<Stmt*> *body;
+ public:
+  DefaultStmt(List<Stmt*> *body);
+  const char *GetPrintNameForNode() { return "Default"; }
+  void PrintChildren(int indentLevel);
+};
+
 
 class IfStmt : public ConditionalStmt 
 {

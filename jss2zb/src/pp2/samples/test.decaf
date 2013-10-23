@@ -1,0 +1,13 @@
+void main(){
+int a;
+
+break;
+a=2;
+
+for(;x = 2;)
+{ 
+  break;
+}
+a=2;
+return a=2;
+}
