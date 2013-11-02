@@ -96,6 +96,22 @@ class Node
     void Print(int indentLevel, const char *label = NULL); 
     virtual void PrintChildren(int indentLevel)  {}
     virtual void Build(Tree *tree) {}
+    virtual void Check(Tree *tree) {}
+};
+
+class Identifier : public Node 
+{
+  protected:
+    char *name;
+    
+  public:
+    Identifier(yyltype loc, const char *name);
+    const char *GetPrintNameForNode()   { return "Identifier"; }
+    void PrintChildren(int indentLevel);
+    char *GetName() { return name; };
+    void Build(Tree *tree);
+    void Check(Tree *tree);
+    yyltype* GetLocation() {return location;}
 };
 
 class Type : public Node
@@ -114,19 +130,6 @@ class Type : public Node
   void PrintChildren(int indentLevel);
 };
 
-class Identifier : public Node 
-{
-  protected:
-    char *name;
-    
-  public:
-    Identifier(yyltype loc, const char *name);
-    const char *GetPrintNameForNode()   { return "Identifier"; }
-    void PrintChildren(int indentLevel);
-    char *GetName() { return name; };
-    void Build(Tree *tree);
-    yyltype* GetLocation() {return location;}
-};
 
 // This node class is designed to represent a portion of the tree that 
 // encountered syntax errors during parsing. The partial completed tree

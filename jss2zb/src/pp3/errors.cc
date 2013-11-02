@@ -79,7 +79,7 @@ void ReportError::UnrecogChar(yyltype *loc, char ch) {
 
 void ReportError::DeclConflict(Decl *decl, Decl *prevDecl) {
     stringstream s;
-    s << "Declaration of '" << decl << "' here conflicts with declaration on line " 
+    s << "Declaration of '" << (decl->GetName())->GetName() << "' here conflicts with declaration on line " 
       << prevDecl->GetLocation()->first_line;
     OutputError(decl->GetLocation(), s.str());
 }
@@ -100,7 +100,7 @@ void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
     stringstream s;
     static const char *names[] =  {"type", "class", "interface", "variable", "function"};
     Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names)/sizeof(names[0]));
-    s << "No declaration found for "<< names[whyNeeded] << " '" << ident << "'";
+    s << "No declaration found for "<< names[whyNeeded] << " '" << ident->GetName() << "'";
     OutputError(ident->GetLocation(), s.str());
 }
 

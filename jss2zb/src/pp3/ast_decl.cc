@@ -29,6 +29,11 @@ void VarDecl::Build(Tree *tree)
       ReportError::DeclConflict(this,temp);
     }
 }
+
+void VarDecl::Check(Tree *tree)
+{
+  //Eventually do Type Check
+}
  
 void VarDecl::PrintChildren(int indentLevel) { 
    type->Print(indentLevel+1);
@@ -64,6 +69,28 @@ void ClassDecl::Build(Tree *tree)
   tree->InsertChild(theTree);
 }
 
+void ClassDecl::Check(Tree *tree)
+{
+  if(extends)
+    {
+      Decl* myDecl = tree->Lookup((extends->GetName())->GetName());
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForClass;
+	  ReportError::IdentifierNotDeclared(extends->GetName(), t);
+	}
+    }
+  for(int i = 0; i < implements->NumElements(); i++)
+    {
+      Decl* myDecl = tree->Lookup((implements->Nth(i))->GetName()->GetName());
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForInterface;
+	  ReportError::IdentifierNotDeclared((implements->Nth(i))->GetName(),t);
+	}
+    }
+}
+
 void ClassDecl::PrintChildren(int indentLevel) {
     id->Print(indentLevel+1);
     if (extends) extends->Print(indentLevel+1, "(extends) ");
@@ -95,6 +122,11 @@ void InterfaceDecl::Build(Tree *tree)
       (members->Nth(i))->Build(theTree);
     }
   tree->InsertChild(theTree);
+}
+
+void InterfaceDecl::Check(Tree *tree)
+{
+  //
 }
 
 void InterfaceDecl::PrintChildren(int indentLevel) {
@@ -133,6 +165,21 @@ void FnDecl::Build(Tree *tree)
     }
   tree->InsertChild(theTree);
 }
+
+void FnDecl::Check(Tree *tree)
+  {
+    int index = 0;
+    for(int i = 0; i < formals->NumElements(); i++)
+      {
+        Decl* myDecl = tree->Lookup((((formals->Nth(i)))->GetName())->GetName());
+        if(myDecl == NULL)
+          {
+            reasonT t = LookingForType;
+	    ReportError::IdentifierNotDeclared((formals->Nth(i))->GetName(), t);
+	  }
+      }
+    //Check return?
+  }
 
 void FnDecl::SetFunctionBody(Stmt *b) { 
     (body=b)->SetParent(this);

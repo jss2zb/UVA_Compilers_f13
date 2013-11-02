@@ -23,6 +23,7 @@ class NamedType : public Type
     
     const char *GetPrintNameForNode() { return "NamedType"; }
     void PrintChildren(int indentLevel);
+    Identifier* GetName() {return id;}
 };
 
 class ArrayType : public Type 

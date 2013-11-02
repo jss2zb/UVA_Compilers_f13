@@ -31,6 +31,7 @@ class Program : public Node
      const char *GetPrintNameForNode() { return "Program"; }
      void PrintChildren(int indentLevel);
      void Build(); 
+     void Check();
 };
 
 class Stmt : public Node

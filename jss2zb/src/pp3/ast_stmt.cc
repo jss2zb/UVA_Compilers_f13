@@ -16,14 +16,14 @@ Program::Program(List<Decl*> *d) {
 }
 
 
-/*
+
 void Program::Check() 
 {
   for(int i = 0; i < decls->NumElements();i++)
     {
-      scope = (decls->Nth(i))->Check(scope);
+      (decls->Nth(i))->Check(scope);
     }
-    }*/
+}
 
 void Program::Build() 
 {
