@@ -171,11 +171,14 @@ void FnDecl::Check(Tree *tree)
     int index = 0;
     for(int i = 0; i < formals->NumElements(); i++)
       {
-        Decl* myDecl = tree->Lookup((((formals->Nth(i)))->GetName())->GetName());
+	Type* t = formals->Nth(i)->GetType();
+	Identifier* name = t->GetIdentifier(t->GetLocation());
+	printf("1\n");
+        Decl* myDecl = tree->Lookup(formals->Nth(i)->GetName()->GetName());
         if(myDecl == NULL)
           {
             reasonT t = LookingForType;
-	    ReportError::IdentifierNotDeclared((formals->Nth(i))->GetName(), t);
+	    ReportError::IdentifierNotDeclared(formals->Nth(i)->GetName(), t);
 	  }
       }
     //Check return?

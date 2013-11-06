@@ -23,7 +23,8 @@ class NamedType : public Type
     
     const char *GetPrintNameForNode() { return "NamedType"; }
     void PrintChildren(int indentLevel);
-    Identifier* GetName() {return id;}
+    Identifier* GetIdentifier(yyltype* loc) {return id;};
+    Identifier* GetName() {return id;};
 };
 
 class ArrayType : public Type 
@@ -36,6 +37,7 @@ class ArrayType : public Type
     
     const char *GetPrintNameForNode() { return "ArrayType"; }
     void PrintChildren(int indentLevel);
+    Identifier* GetIdentifier(yyltype* loc) {return elemType->GetIdentifier(loc);};
 };
 
  

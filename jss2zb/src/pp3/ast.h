@@ -128,6 +128,14 @@ class Type : public Node
 
   const char *GetPrintNameForNode() { return "Type"; }
   void PrintChildren(int indentLevel);
+  //Modified
+  virtual Identifier* GetIdentifier(yyltype* loc) 
+    {       
+      printf("HERE!\n");
+      char* tName = typeName;
+      printf("%s\n",typeName);
+      printf("HERE HERE!\n");
+      return new Identifier((*loc),typeName);};
 };
 
 
