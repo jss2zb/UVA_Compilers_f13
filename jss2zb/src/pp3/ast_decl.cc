@@ -32,7 +32,16 @@ void VarDecl::Build(Tree *tree)
 
 void VarDecl::Check(Tree *tree)
 {
-  //Eventually do Type Check
+  Identifier* name = type->GetIdentifier();
+  if(strcmp(name->GetName(), "int") != 0 && strcmp(name->GetName(),"double") != 0 && strcmp(name->GetName(),"string") != 0 && strcmp(name->GetName(),"bool") != 0)
+    {
+      Decl* myDecl = tree->Lookup(type->GetIdentifier()->GetName());
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForType;
+	  ReportError::IdentifierNotDeclared(type->GetIdentifier(),t);
+	}
+    }
 }
  
 void VarDecl::PrintChildren(int indentLevel) { 
@@ -66,6 +75,7 @@ void ClassDecl::Build(Tree *tree)
     {
       (members->Nth(i))->Build(theTree);
     }
+  scope = theTree;
   tree->InsertChild(theTree);
 }
 
@@ -159,10 +169,12 @@ void FnDecl::Build(Tree *tree)
     {
       (formals->Nth(i))->Build(theTree);
     }
+  
   if(body)
     {
       body->Build(theTree);
     }
+  scope = theTree;
   tree->InsertChild(theTree);
 }
 
@@ -172,14 +184,22 @@ void FnDecl::Check(Tree *tree)
     for(int i = 0; i < formals->NumElements(); i++)
       {
 	Type* t = formals->Nth(i)->GetType();
-	Identifier* name = t->GetIdentifier(t->GetLocation());
-	printf("1\n");
-        Decl* myDecl = tree->Lookup(formals->Nth(i)->GetName()->GetName());
-        if(myDecl == NULL)
-          {
-            reasonT t = LookingForType;
-	    ReportError::IdentifierNotDeclared(formals->Nth(i)->GetName(), t);
+	Identifier* name = t->GetIdentifier();
+	
+	if(strcmp(name->GetName(), "int") != 0 && strcmp(name->GetName(),"double") != 0 && strcmp(name->GetName(),"string") != 0 && strcmp(name->GetName(),"bool") != 0)
+	  {
+	
+	    Decl* myDecl = scope->Lookup(formals->Nth(i)->GetType()->GetIdentifier()->GetName());
+	    if(myDecl == NULL)
+	      {
+		reasonT t = LookingForType;
+		ReportError::IdentifierNotDeclared(formals->Nth(i)->GetType()->GetIdentifier(), t);
+	      }
 	  }
+      }
+    if(body)
+      {
+	body->Check(scope);
       }
     //Check return?
   }

@@ -62,8 +62,20 @@ void StmtBlock::Build(Tree *tree)
     {
       (stmts->Nth(i))->Build(theTree);
     }
-
+  scope = theTree;
   tree->InsertChild(theTree);
+}
+
+void StmtBlock::Check(Tree *tree)
+{
+  for(int i = 0; i < decls->NumElements();i++)
+    {
+      (decls->Nth(i))->Check(scope);
+    }
+  for(int i = 0; i < stmts->NumElements(); i++)
+    {
+      (stmts->Nth(i))->Check(scope);
+    }
 }
 
 void StmtBlock::PrintChildren(int indentLevel) {
@@ -123,9 +135,12 @@ void ForStmt::PrintChildren(int indentLevel) {
 void WhileStmt::Build(Tree *tree)
 {
   test->Build(tree);
-  Tree *theTree = new Tree(tree);
-  body->Build(theTree);
-  tree->InsertChild(theTree);
+  body->Build(tree);
+}
+
+void WhileStmt::Check(Tree *tree)
+{
+  body->Check(tree);
 }
 
 void WhileStmt::PrintChildren(int indentLevel) {
@@ -188,6 +203,12 @@ void IfStmt::Build(Tree *tree)
   test->Build(tree);
   body->Build(tree);
   if(elseBody) elseBody->Build(tree);
+}
+
+void IfStmt::Check(Tree *tree)
+{
+  body->Check(tree);
+  if(elseBody) elseBody->Check(tree);
 }
 
 void IfStmt::PrintChildren(int indentLevel) {

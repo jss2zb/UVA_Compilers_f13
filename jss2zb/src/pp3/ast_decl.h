@@ -51,6 +51,7 @@ class ClassDecl : public Decl
     List<Decl*> *members;
     NamedType *extends;
     List<NamedType*> *implements;
+    Tree *scope;
 
   public:
     ClassDecl(Identifier *name, NamedType *extends, 
@@ -82,7 +83,8 @@ class FnDecl : public Decl
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
-    
+    Tree *scope;
+
   public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);

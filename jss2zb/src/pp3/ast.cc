@@ -42,6 +42,12 @@ Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
 } 
 
+//Modified
+Identifier::Identifier(const char *n) : Node()
+{
+  name = strdup(n);
+}
+
 void Identifier::Build(Tree *tree){}
 void Identifier::Check(Tree *tree){}
 

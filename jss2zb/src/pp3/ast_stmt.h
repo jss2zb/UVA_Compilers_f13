@@ -48,12 +48,14 @@ class StmtBlock : public Stmt
   protected:
     List<VarDecl*> *decls;
     List<Stmt*> *stmts;
+    Tree* scope;
     
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
     const char *GetPrintNameForNode() { return "StmtBlock"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
   
@@ -94,6 +96,7 @@ class WhileStmt : public LoopStmt
     const char *GetPrintNameForNode() { return "WhileStmt"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
 class SwitchStmt : public LoopStmt
@@ -143,6 +146,7 @@ class IfStmt : public ConditionalStmt
     const char *GetPrintNameForNode() { return "IfStmt"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
 class BreakStmt : public Stmt 

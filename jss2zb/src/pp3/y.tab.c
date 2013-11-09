@@ -1816,7 +1816,7 @@ yyreduce:
 #line 126 "parser.y"
     { Program *program = new Program((yyvsp[(1) - (1)].declList));
                                      if (ReportError::NumErrors() == 0) 
-				       //program->Print(0);
+				       program->Print(0);
 				     program->Build();
 				     program->Check();
                                    }
