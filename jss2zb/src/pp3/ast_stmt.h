@@ -41,6 +41,7 @@ class Stmt : public Node
   Stmt(yyltype loc) : Node(loc) {};
   //virtual Tree Build(Tree *tree) {return tree;}
   void Build(Tree *tree) {};
+  void Check(Tree *tree) {};
 };
 
 class StmtBlock : public Stmt 
@@ -75,6 +76,7 @@ class LoopStmt : public ConditionalStmt
   public:
     LoopStmt(Expr *testExpr, Stmt *body) : ConditionalStmt(testExpr, body) {}
   virtual void Build(Tree *tree) {}
+  bool IsInLoop() {return true;}
 };
 
 class ForStmt : public LoopStmt 
@@ -99,42 +101,6 @@ class WhileStmt : public LoopStmt
     void Check(Tree *tree);
 };
 
-class SwitchStmt : public LoopStmt
-{
- protected:
-   List<Stmt*> *cases;
-
- public:
-   SwitchStmt(Expr *test, List<Stmt*> *cases, Stmt *body); 
-   const char *GetPrintNameForNode() { return "SwitchStmt";}
-   void PrintChildren(int indentLevel);
-   void Build(Tree *tree);
-};
-
-class CaseStmt : public Stmt
-{
- protected:
-  Expr *test;
-  List<Stmt*> *body;
-
- public: 
-  CaseStmt(Expr *test, List<Stmt*> *body);
-  const char *GetPrintNameForNode() { return "Case"; }
-  void PrintChildren(int indentLevel);
-  void Build(Tree *tree);
-};
-
-class DefaultStmt : public Stmt
-{
- protected:
-  List<Stmt*> *body;
- public:
-  DefaultStmt(List<Stmt*> *body);
-  const char *GetPrintNameForNode() { return "Default"; }
-  void PrintChildren(int indentLevel);
-  void Build(Tree *tree);
-};
-
 
 class IfStmt : public ConditionalStmt 
 {
@@ -155,6 +121,7 @@ class BreakStmt : public Stmt
  BreakStmt(yyltype loc) : Stmt(loc) {};
     const char *GetPrintNameForNode() { return "BreakStmt"; }
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
 class ReturnStmt : public Stmt  

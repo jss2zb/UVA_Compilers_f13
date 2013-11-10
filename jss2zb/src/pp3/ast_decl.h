@@ -25,6 +25,7 @@ class Decl : public Node
   public:
     Decl(Identifier *name);
     virtual Identifier* GetName() {return id;}
+
     //Modified
     virtual Type* GetType() {return new Type(id->GetName());};
 };

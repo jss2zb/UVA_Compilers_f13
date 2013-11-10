@@ -6,7 +6,7 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "ast_expr.h"
-
+#include "errors.h"
 
 
 Program::Program(List<Decl*> *d) {
@@ -89,24 +89,6 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body=b)->SetParent(this);
 }
 
-SwitchStmt::SwitchStmt(Expr *t, List<Stmt*> *c, Stmt *b): LoopStmt(t,b) {
-  Assert(t != NULL && b != NULL);
-  (test=t)->SetParent(this);
-  (body=b)->SetParent(this);
-  (cases=c)->SetParentAll(this);
-}
-
-CaseStmt::CaseStmt(Expr *t, List<Stmt*> *b) {
-  Assert(t != NULL && b != NULL);
-  (test=t)->SetParent(this);
-  (body=b)->SetParentAll(this);
-}
-
-DefaultStmt::DefaultStmt(List<Stmt*> *b) {
-  Assert(b != NULL);
-  (body=b)->SetParentAll(this);
-}
-
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != NULL && t != NULL && s != NULL && b != NULL);
     (init=i)->SetParent(this);
@@ -146,50 +128,6 @@ void WhileStmt::Check(Tree *tree)
 void WhileStmt::PrintChildren(int indentLevel) {
     test->Print(indentLevel+1, "(test) ");
     body->Print(indentLevel+1, "(body) ");
-}
-
-void SwitchStmt::Build(Tree *tree)
-{
-  test->Build(tree);
-  Tree *theTree = new Tree(tree);
-  for(int i = 0; i < cases->NumElements(); i++)
-    {
-      (cases->Nth(i))->Build(theTree);
-    }
-  body->Build(theTree);
-  tree->InsertChild(theTree);
-}
-
-void SwitchStmt::PrintChildren(int indentLevel) {
-  test->Print(indentLevel+1);
-  cases->PrintAll(indentLevel+1);
-  body->Print(indentLevel+1);
-}
-
-void CaseStmt::Build(Tree *tree)
-{
-  test->Build(tree);
-  for(int i = 0; i < body->NumElements(); i++)
-    {
-      (body->Nth(i))->Build(tree);
-    }
-}
-
-void CaseStmt::PrintChildren(int indentLevel) {
-  test->Print(indentLevel+1);
-  body->PrintAll(indentLevel+1);
-}
-
-void DefaultStmt::Build(Tree *tree)
-{
-  for(int i = 0; i < body->NumElements(); i++)
-    {
-      (body->Nth(i))->Build(tree);
-    }
-}
-
-void DefaultStmt::PrintChildren(int indentLevel) {
-  body->PrintAll(indentLevel+1);
 }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
@@ -249,3 +187,11 @@ void PrintStmt::PrintChildren(int indentLevel) {
 }
 
 void BreakStmt::Build(Tree *tree){}
+
+void BreakStmt::Check(Tree *tree)
+{
+  if(!(parent->IsInLoop()))
+    {
+      ReportError::BreakOutsideLoop(this);
+    }
+}

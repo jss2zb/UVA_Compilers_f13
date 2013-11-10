@@ -23,6 +23,8 @@ class Expr : public Stmt
   public:
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
+    virtual Type* GetType() {return Type::errorType;};
+    //    virtual void Check(Tree *tree) {};
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -33,6 +35,7 @@ class EmptyExpr : public Expr
   public:
     const char *GetPrintNameForNode() { return "Empty"; }
     void Build(Tree *tree) {};
+    Type* GetType() {return Type::voidType;};
 };
 
 class IntConstant : public Expr 
@@ -45,6 +48,7 @@ class IntConstant : public Expr
     const char *GetPrintNameForNode() { return "IntConstant"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    Type* GetType() {return new Type("int");}; // Type::intType;};
 };
 
 class DoubleConstant : public Expr 
@@ -57,6 +61,7 @@ class DoubleConstant : public Expr
     const char *GetPrintNameForNode() { return "DoubleConstant"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    Type* GetType() {return new Type("double");}; //Type::doubleType;};
 };
 
 class BoolConstant : public Expr 
@@ -69,6 +74,7 @@ class BoolConstant : public Expr
     const char *GetPrintNameForNode() { return "BoolConstant"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    Type* GetType() {return new Type("bool");};//Type::boolType;};
 };
 
 class StringConstant : public Expr 
@@ -81,6 +87,7 @@ class StringConstant : public Expr
     const char *GetPrintNameForNode() { return "StringConstant"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    Type* GetType() {return new Type("string");}; //Type::stringType;};
 };
 
 class NullConstant: public Expr 
@@ -89,6 +96,7 @@ class NullConstant: public Expr
  NullConstant(yyltype loc) : Expr(loc) {} 
     const char *GetPrintNameForNode() { return "NullConstant"; }
     void Build(Tree *tree);
+    Type* GetType() {return new Type("null");}; //Type::nullType;};
 };
 
 class Operator : public Node 
@@ -111,9 +119,10 @@ class CompoundExpr : public Expr
   public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
-    CompoundExpr(Expr *lhs, Operator *op);            // for Incr/Decr
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    //void Check(Tree *tree) {};
+    //virtual  Type* GetType() {return new Type("ERROR");}
 };
 
 class ArithmeticExpr : public CompoundExpr 
@@ -121,16 +130,10 @@ class ArithmeticExpr : public CompoundExpr
   public:
  ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
  ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
-    const char *GetPrintNameForNode() { return "ArithmeticExpr"; }
-    void Build(Tree *tree);
-};
-
-class PostfixExpr : public CompoundExpr
-{
- public:
- PostfixExpr(Expr *lhs, Operator *op) : CompoundExpr(lhs,op) {}
-  const char *GetPrintNameForNode() { return "PostfixExpr"; }
+  const char *GetPrintNameForNode() { return "ArithmeticExpr"; };
   void Build(Tree *tree);
+  //  void Check(Tree *tree);
+  Type* GetType();
 };
 
 class RelationalExpr : public CompoundExpr 
@@ -139,6 +142,7 @@ class RelationalExpr : public CompoundExpr
  RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "RelationalExpr"; }
     void Build(Tree *tree);
+    //    void Check(Tree *tree);
 };
 
 class EqualityExpr : public CompoundExpr 
@@ -171,6 +175,8 @@ class LValue : public Expr
   public:
  LValue(yyltype loc) : Expr(loc) {}
   void Build(Tree *tree);
+  //virtual Type* GetType();
+  virtual Type* GetType() {return new Type("ERROR");};
 };
 
 class This : public Expr 
@@ -209,6 +215,7 @@ class FieldAccess : public LValue
     const char *GetPrintNameForNode() { return "FieldAccess"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    Type* GetType();
 };
 
 /* Like field access, call is used both for qualified base.field()

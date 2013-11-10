@@ -88,6 +88,14 @@ class Node
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
+    virtual bool IsInLoop() 
+    {
+      if(parent)
+	{
+	  return parent->IsInLoop();
+	}
+      return false;
+    }
 
     virtual const char *GetPrintNameForNode() = 0;
     

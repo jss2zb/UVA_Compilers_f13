@@ -112,8 +112,8 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <namedList> ClassOpts2 IdentList
 %type <iDecl>     InterfaceDecl
 %type <fDecl>     FnDecl FnHeader Prototype
-%type <stmtList>  StmtList Cases
-%type <stmt>      StmtBlock Stmt IfStmt WhileStmt PrintStmt BreakStmt ReturnStmt ForStmt SwitchStmt Case Default
+%type <stmtList>  StmtList 
+%type <stmt>      StmtBlock Stmt IfStmt WhileStmt PrintStmt BreakStmt ReturnStmt ForStmt 
 %type <expr>      Expr OptExpr Constants LValue Call
 %type <exprList>  ExprList Actuals
 %%
@@ -208,18 +208,7 @@ Stmt      : Expr ';'    {$$ = $1;}
           | ReturnStmt  {$$ = $1;}  
           | PrintStmt   {$$ = $1;} 
           | StmtBlock   {$$ = $1;}
-          | SwitchStmt  {$$ = $1;}
 ;
-
-SwitchStmt: J_Switch '(' Expr ')' '{' Cases Default '}' {$$ = new SwitchStmt($3,$6,$7);};
-
-Cases       : Cases Case {($$=$1)->Append($2);}
-            | /**/       {$$ = new List<Stmt*>;};
-
-Case      : J_Case T_IntConstant ':' StmtList {$$ = new CaseStmt(new IntConstant(@2,$2),$4);};
-          | J_Case T_IntConstant ':'          {$$ = new CaseStmt(new IntConstant(@2,$2), new List<Stmt*>);};
-
-Default   : J_Default ':' StmtList {$$ = new DefaultStmt($3);};
 
 OptExpr   : Expr      {$$ = $1;}
           | /*empty*/ {$$ = new EmptyExpr();};
@@ -260,8 +249,6 @@ Expr      : LValue '=' Expr                  {$$ = new AssignExpr($1,new Operato
           | Expr '/' Expr                    {$$ = new ArithmeticExpr($1,new Operator(@2,"/"),$3);} 
           | Expr '%' Expr                    {$$ = new ArithmeticExpr($1,new Operator(@2,"%"),$3);}
           | '-' Expr                         {$$ = new ArithmeticExpr(new Operator(@1,"-"),$2);}
-          | Expr '+' '+'                     {$$ = new PostfixExpr($1,new Operator(@1,"++"));}
-          | Expr '-' '-'                     {$$ = new PostfixExpr($1,new Operator(@1,"--"));}   
           | '!' Expr                         {$$ = new LogicalExpr(new Operator(@1,"!"),$2);}
           | '(' Expr ')'                     {$$ = $2;};
 

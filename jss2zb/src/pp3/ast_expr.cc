@@ -5,6 +5,7 @@
 #include "ast_expr.h"
 #include "ast_type.h"
 #include "ast_decl.h"
+#include "errors.h"
 #include <string.h>
 
 
@@ -76,19 +77,25 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r) : Expr(Join(o->GetLocation(), r
     (right=r)->SetParent(this);
 }
 
-CompoundExpr::CompoundExpr(Expr *l,Operator *o)  : Expr(Join(l->GetLocation(), o->GetLocation())) 
-{
-    Assert(l != NULL && o != NULL);
-    (left=l)->SetParent(this);
-    (op=o)->SetParent(this);
-    right = NULL;
-}
-
 void CompoundExpr::Build(Tree *tree)
 {
   if(left) left->Build(tree);
-  if(right) right->Build(tree);  
+  right->Build(tree);  
 }
+
+/*void CompoundExpr::Check(Tree *tree)
+{
+  Type *rType = right->GetType();
+  if(rType->GetName() 
+  if(left) 
+    {
+      Type *lType = left->GetType();
+    }
+  else
+    {
+
+    }
+    }*/
 
 void CompoundExpr::PrintChildren(int indentLevel) 
 {
@@ -97,7 +104,33 @@ void CompoundExpr::PrintChildren(int indentLevel)
    if (right) right->Print(indentLevel+1);
 }
 
-void ArithmeticExpr::Build(Tree *tree){}
+  
+  Type* ArithmeticExpr::GetType()
+{
+  if(left)
+    {
+      if(strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) 
+	{
+	  return right->GetType();
+	}
+      else if(strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0)
+	{
+	  return left->GetType();
+	}
+    }
+  return right->GetType();
+  }
+  /*
+void ArithmeticExpr::Check(Tree *tree)
+{
+  if(left)
+    {
+      if(!((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0)))
+	{
+	  ReportError::IncompatibleOperands(op,left->GetType(),right->GetType());
+	}
+    }  
+    }*/
    
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
@@ -126,6 +159,11 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 void FieldAccess::Build(Tree *tree)
 {
   if(base) base->Build(tree);
+}
+
+Type* FieldAccess::GetType()
+{
+  return new Type(field->GetName());
 }
 
   void FieldAccess::PrintChildren(int indentLevel) {
@@ -183,7 +221,6 @@ void NewArrayExpr::PrintChildren(int indentLevel) {
     elemType->Print(indentLevel+1);
 }
 
-void PostfixExpr::Build(Tree *tree){}
 
 void RelationalExpr::Build(Tree *tree){}
 
@@ -200,3 +237,13 @@ void ReadIntegerExpr::Build(Tree *tree){}
 void ReadLineExpr::Build(Tree *tree){}
 
 void LValue::Build(Tree *tree){}
+
+/*Type* FieldAccess::GetType()
+{
+  return new Type(field->GetName());
+}
+
+Type* ArrayAccess::GetType()
+{
+  return base->GetType();
+  }*/
