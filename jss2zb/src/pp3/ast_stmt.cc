@@ -72,6 +72,7 @@ void StmtBlock::Check(Tree *tree)
     {
       (decls->Nth(i))->Check(scope);
     }
+
   for(int i = 0; i < stmts->NumElements(); i++)
     {
       (stmts->Nth(i))->Check(scope);
@@ -99,12 +100,19 @@ void ForStmt::Build(Tree *tree)
 {
   Tree *theTree = new Tree(tree);
   init->Build(theTree);
-  //  if(!test->Build(hash))
-  //  {
-  //    ReportError::Formatted(
-  //  }
   body->Build(theTree);
+  scope = theTree;
   tree->InsertChild(theTree);
+}
+
+void ForStmt::Check(Tree *tree)
+{
+  if(!(strcmp(test->GetType(scope)->GetIdentifier()->GetName(),"bool") == 0))
+    {
+      ReportError::TestNotBoolean(test);
+    }
+  step->Check(scope);
+  body->Check(scope);
 }
 
 void ForStmt::PrintChildren(int indentLevel) {
@@ -145,8 +153,13 @@ void IfStmt::Build(Tree *tree)
 
 void IfStmt::Check(Tree *tree)
 {
+  test->Check(tree);
+  if(!(strcmp(test->GetType(tree)->GetIdentifier()->GetName(),"bool") == 0))
+    {
+      ReportError::TestNotBoolean(test);
+    }
   body->Check(tree);
-  if(elseBody) elseBody->Check(tree);
+  if(elseBody) {elseBody->Check(tree);}
 }
 
 void IfStmt::PrintChildren(int indentLevel) {
@@ -160,10 +173,21 @@ void ReturnStmt::Build(Tree *tree)
   expr->Build(tree);
 }
 
+void ReturnStmt::Check(Tree *tree)
+{
+  expr->Check(tree);
+  /*if(!(strcmp(this->GetType()->GetIdentifier()->GetName(),expr->GetType(tree)->GetIdentifier()->GetName()) == 0))
+    {
+      ReportError::ReturnMismatch(this,this->GetType(),expr->GetType(tree));
+      }*/
+}
+
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
     Assert(e != NULL);
     (expr=e)->SetParent(this);
 }
+
+
 
 void ReturnStmt::PrintChildren(int indentLevel) {
     expr->Print(indentLevel+1);

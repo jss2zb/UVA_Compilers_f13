@@ -106,13 +106,16 @@ void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
 
 void ReportError::IncompatibleOperands(Operator *op, Type *lhs, Type *rhs) {
     stringstream s;
-    s << "Incompatible operands: " << lhs->GetIdentifier()->GetName() << " " << op->GetName() << " " << rhs->GetIdentifier()->GetName();
-    OutputError(op->GetLocation(), s.str());
+    if(!(strcmp(lhs->GetIdentifier()->GetName(),"error") == 0) && !(strcmp(rhs->GetIdentifier()->GetName(),"error") == 0))
+      {
+	s << "Incompatible operands: " << lhs->GetIdentifier()->GetName() << " " << op->GetName() << " " << rhs->GetIdentifier()->GetName();
+	OutputError(op->GetLocation(), s.str());
+      }
 }
      
 void ReportError::IncompatibleOperand(Operator *op, Type *rhs) {
     stringstream s;
-    s << "Incompatible operand: " << op << " " << rhs;
+    s << "Incompatible operand: " << op->GetName() << " " << rhs->GetIdentifier()->GetName();
     OutputError(op->GetLocation(), s.str());
 }
 
@@ -153,7 +156,7 @@ void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected)
 
 void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
     stringstream s;
-    s << base << " has no such field '" << field <<"'";
+    s << base->GetIdentifier()->GetName() << " has no such field '" << field->GetName() <<"'";
     OutputError(field->GetLocation(), s.str());
 }
      

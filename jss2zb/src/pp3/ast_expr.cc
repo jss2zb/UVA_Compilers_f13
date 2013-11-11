@@ -105,11 +105,12 @@ Type* ArithmeticExpr::GetType(Tree *tree)
 
 void ArithmeticExpr::Check(Tree *tree)
 {
-  left->Check(tree);
+  
   right->Check(tree);
   
   if(left)
     {
+      left->Check(tree);
       if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
 	{
 	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
@@ -119,6 +120,13 @@ void ArithmeticExpr::Check(Tree *tree)
 	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
 	}      
     }  
+  else
+    {
+      if(!(strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"double") == 0) && !(strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"int") == 0))
+        {
+	  ReportError::IncompatibleOperand(op,right->GetType(tree));
+        }
+    }
 }
 
 void AssignExpr::Check(Tree *tree)
@@ -140,6 +148,7 @@ void AssignExpr::Check(Tree *tree)
           rType = new Type(strcat(rType->GetIdentifier()->GetName(),"[]"));
         }
       ReportError::IncompatibleOperands(op,lType,rType);
+
     }
 }
 
@@ -150,7 +159,7 @@ void RelationalExpr::Check(Tree *tree)
   
   if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
     {
-      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
     }
   else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"int")==0) && !(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"double")==0))
     {
@@ -165,16 +174,28 @@ Type* RelationalExpr::GetType(Tree *tree)
 
 void LogicalExpr::Check(Tree *tree)
 {
-  left->Check(tree);
+  printf("HERE!\n");
+  if(left) left->Check(tree);
   right->Check(tree);
   
-  if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
+  if(left)
     {
-      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+      if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
+	{
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+	}
+      else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"bool")==0))
+	{
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+	}
     }
-  else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"bool")==0))
+  else
     {
-      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+      printf("UNARY\n");
+      if(!(strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"bool")==0))
+	{
+	  ReportError::IncompatibleOperand(op,right->GetType(tree));
+	}
     }
 
 }
@@ -216,6 +237,70 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals=a)->SetParentAll(this);
 }
 
+void Call::Check(Tree *tree)
+{
+  for(int i = 0; i < actuals->NumElements();i++)
+    {
+      actuals->Nth(i)->Check(tree);
+    }
+
+  if(base)
+    {
+      Decl *myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForClass;
+	  ReportError::IdentifierNotDeclared(base->GetType(tree)->GetIdentifier(),t);
+	}
+      else
+	{
+	  if(!myDecl->hasMembers(field))
+	    {
+	      ReportError::FieldNotFoundInBase(field,base->GetType(tree));
+	    }
+	}
+    }
+  else
+    {
+      
+      Decl *myDecl = tree->Lookup(field->GetName());
+      
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForFunction;
+	  ReportError::IdentifierNotDeclared(field,t);
+	}
+    }
+}
+
+Type* Call::GetType(Tree *tree)
+{
+  if(base)
+    {
+      Decl *myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
+      if(myDecl != NULL)
+	{
+	  if(myDecl->hasMembers(field))
+	    {
+	      myDecl = myDecl->GetScope()->Lookup(field->GetName());
+	      if(myDecl != NULL)
+		{
+		  return myDecl->GetType();
+		}
+	    }
+	}
+    }
+  else
+    {
+      Decl *myDecl = tree->Lookup(field->GetName());
+      if(myDecl != NULL)
+	{
+	  return myDecl->GetType();
+	}
+    }
+  return new Type("error");
+}
+
  void Call::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
     field->Print(indentLevel+1);
@@ -252,6 +337,27 @@ void FieldAccess::Check(Tree *tree)
 	{
 	  reasonT t = LookingForVariable;
 	  ReportError::IdentifierNotDeclared(field,t);
+	}
+    }
+  else
+    {
+      printf("%s\n",base->GetType(tree)->GetIdentifier()->GetName());
+      Decl* myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
+      if(myDecl)
+	{
+	  if(!myDecl->hasMembers(base->GetType(tree)->GetIdentifier()))
+	    {
+	      ReportError::FieldNotFoundInBase(field,base->GetType(tree));
+	    }
+	}
+      else
+	{
+	  Type *lType = base->GetType(tree);
+	  if(lType->isArray())
+	    {
+	      lType = new Type(strcat(lType->GetIdentifier()->GetName(),"[]"));
+	    }
+	  ReportError::FieldNotFoundInBase(field,lType);
 	}
     }
 }
@@ -304,4 +410,23 @@ void NewArrayExpr::Check(Tree *tree)
 Type* NewArrayExpr::GetType(Tree *tree)
 {
   return new ArrayType((*location),elemType);
+}
+
+void This::Check(Tree *tree)
+{
+  if(this->GetClass() == NULL)
+    {
+      ReportError::ThisOutsideClassScope(this);
+    }
+}
+
+Type* This::GetType(Tree *tree)
+{
+  Type *tType = this->GetClass();
+  if(tType == NULL)
+    {
+      tType = new Type("error");
+    }
+  return tType;
+  
 }

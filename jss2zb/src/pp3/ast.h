@@ -96,6 +96,24 @@ class Node
 	}
       return false;
     }
+    
+    virtual Type* GetClass()
+    {
+      if(parent)
+	{
+	  parent->GetClass();
+	}
+      return NULL;
+    }
+    
+    virtual Type* GetType()
+    {
+      if(parent)
+	{
+	  parent->GetType();
+	}
+      return NULL;
+    }
 
     virtual const char *GetPrintNameForNode() = 0;
     

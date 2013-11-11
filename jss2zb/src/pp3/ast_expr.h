@@ -24,7 +24,7 @@ class Expr : public Stmt
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
     virtual Type* GetType(Tree *tree) {return Type::errorType;}
-  //  virtual void Check(Tree *tree) {};
+    //    virtual void Check(Tree *tree) {printf("error");}
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -191,6 +191,8 @@ class This : public Expr
  This(yyltype loc) : Expr(loc) {}
     const char *GetPrintNameForNode() { return "This"; }
     void Build(Tree *tree){}
+    void Check(Tree *tree);
+    Type* GetType(Tree *tree);
 };
 
 class ArrayAccess : public LValue 
@@ -243,6 +245,8 @@ class Call : public Expr
     const char *GetPrintNameForNode() { return "Call"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree) {}
+    void Check(Tree *tree);
+    Type* GetType(Tree *tree);
 };
 
 class NewExpr : public Expr

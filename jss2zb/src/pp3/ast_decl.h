@@ -30,6 +30,8 @@ class Decl : public Node
     virtual Type* GetType() {return new Type(id->GetName());};
     virtual void Build(Tree *tree) = 0;
     virtual void Check(Tree *tree) = 0;
+    virtual bool hasMembers(Identifier *id) = 0;
+    virtual Tree* GetScope() = 0;
 };
 
 class VarDecl : public Decl 
@@ -45,7 +47,9 @@ class VarDecl : public Decl
     void Check(Tree *tree);
     Identifier* GetName() {return id;};
     //Modified
+    Tree* GetScope() {return NULL;};
     Type* GetType() {return type;};
+    bool hasMembers(Identifier *id) {return false;};
 };
 
 class ClassDecl : public Decl 
@@ -64,6 +68,9 @@ class ClassDecl : public Decl
     Identifier* GetName() {return id;};
     void Build(Tree *tree);
     void Check(Tree *tree);
+    Tree* GetScope() {return scope;};
+    Type* GetClass() {return new Type(id->GetName());}
+    bool hasMembers(Identifier *id);
 };
 
 class InterfaceDecl : public Decl 
@@ -77,7 +84,9 @@ class InterfaceDecl : public Decl
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
     void Check(Tree *tree);
+    Tree* GetScope() {return NULL;};
     Identifier* GetName() {return id;};
+    bool hasMembers(Identifier *id);
 };
 
 class FnDecl : public Decl 
@@ -96,6 +105,9 @@ class FnDecl : public Decl
     void Build(Tree *tree);
     void Check(Tree *tree);
     Identifier* GetName() {return id;};
+    Tree* GetScope() {return NULL;};
+    Type* GetType() {return returnType;};
+    bool hasMembers(Identifier *id) {return false;}
 };
 
 #endif

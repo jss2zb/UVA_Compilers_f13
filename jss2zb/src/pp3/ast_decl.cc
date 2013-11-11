@@ -99,6 +99,22 @@ void ClassDecl::Check(Tree *tree)
 	  ReportError::IdentifierNotDeclared((implements->Nth(i))->GetName(),t);
 	}
     }
+  for(int i = 0; i < members->NumElements(); i++)
+    {
+      members->Nth(i)->Check(scope);
+    }
+}
+
+bool ClassDecl::hasMembers(Identifier *id)
+{
+  for(int i = 0; i < members->NumElements(); i++)
+    {
+      if(strcmp(members->Nth(i)->GetName()->GetName(),id->GetName()) == 0)
+	{
+	  return true;
+	}
+    }
+  return false;
 }
 
 void ClassDecl::PrintChildren(int indentLevel) {
@@ -113,6 +129,19 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);
     (members=m)->SetParentAll(this);
 }
+
+bool InterfaceDecl::hasMembers(Identifier *id)
+{
+  for(int i = 0; i < members->NumElements(); i++)
+    {
+      if(strcmp(members->Nth(i)->GetName()->GetName(),id->GetName()) == 0)
+        {
+          return true;
+        }
+    }
+  return false;
+}
+
 
 void InterfaceDecl::Build(Tree *tree)
 {
@@ -202,7 +231,6 @@ void FnDecl::Check(Tree *tree)
       {
 	body->Check(scope);
       }
-    //Check return?
   }
 
 void FnDecl::SetFunctionBody(Stmt *b) { 

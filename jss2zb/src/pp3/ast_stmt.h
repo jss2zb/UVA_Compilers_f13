@@ -41,7 +41,7 @@ class Stmt : public Node
   Stmt(yyltype loc) : Node(loc) {};
   //virtual Tree Build(Tree *tree) {return tree;}
   virtual void Build(Tree *tree) {}
-  virtual void Check(Tree *tree) {}
+  virtual void Check(Tree *tree) {printf("ERROR");}
 };
 
 class StmtBlock : public Stmt 
@@ -83,12 +83,14 @@ class ForStmt : public LoopStmt
 {
   protected:
     Expr *init, *step;
+    Tree *scope;
   
   public:
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
     const char *GetPrintNameForNode() { return "ForStmt"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+     void Check(Tree *tree);
 };
 
 class WhileStmt : public LoopStmt 
@@ -134,6 +136,7 @@ class ReturnStmt : public Stmt
     const char *GetPrintNameForNode() { return "ReturnStmt"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
 class PrintStmt : public Stmt
