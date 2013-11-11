@@ -30,6 +30,7 @@ class Type : public Node
     friend std::ostream& operator<<(std::ostream& out, Type *t) { t->PrintToStream(out); return out; }
     virtual bool IsEquivalentTo(Type *other) { return this == other; }
     virtual char* GetName() {return typeName;};
+    virtual Identifier *GetId() {return new Identifier(typeName);};
 };
 
 class NamedType : public Type 
@@ -62,6 +63,7 @@ class ArrayType : public Type
     void PrintToStream(std::ostream& out) { out << elemType << "[]"; }
     void Check();
     bool IsEquivalentTo(Type *other);
+    Identifier *GetID() {return elemType->GetId();}
 };
 
  

@@ -13,10 +13,6 @@ IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
 
-void IntConstant::Build(Tree *tree){}
-
-void NullConstant::Build(Tree *tree){}
-
 void IntConstant::PrintChildren(int indentLevel) { 
     printf("%d", value);
 }
@@ -24,8 +20,6 @@ void IntConstant::PrintChildren(int indentLevel) {
 DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
-
-void DoubleConstant::Build(Tree *tree) {}
 
 void DoubleConstant::PrintChildren(int indentLevel) { 
     printf("%g", value);
@@ -35,8 +29,6 @@ BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
 }
 
-void BoolConstant::Build(Tree *tree) {}
-
 void BoolConstant::PrintChildren(int indentLevel) { 
     printf("%s", value ? "true" : "false");
 }
@@ -45,8 +37,6 @@ StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     Assert(val != NULL);
     value = strdup(val);
 }
-
-void StringConstant::Build(Tree *tree) {}
 
 void StringConstant::PrintChildren(int indentLevel) { 
     printf("%s",value);
@@ -77,12 +67,6 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r) : Expr(Join(o->GetLocation(), r
     (right=r)->SetParent(this);
 }
 
-void CompoundExpr::Build(Tree *tree)
-{
-  if(left) left->Build(tree);
-  right->Build(tree);  
-}
-
 /*void CompoundExpr::Check(Tree *tree)
 {
   Type *rType = right->GetType();
@@ -96,16 +80,16 @@ void CompoundExpr::Build(Tree *tree)
 
     }
     }*/
-
+    
 void CompoundExpr::PrintChildren(int indentLevel) 
 {
    if (left) left->Print(indentLevel+1);
    op->Print(indentLevel+1);
    if (right) right->Print(indentLevel+1);
-}
+   }
 
   
-  Type* ArithmeticExpr::GetType()
+/*  Type* ArithmeticExpr::GetType()
 {
   if(left)
     {
@@ -120,7 +104,7 @@ void CompoundExpr::PrintChildren(int indentLevel)
     }
   return right->GetType();
   }
-  /*
+*/
 void ArithmeticExpr::Check(Tree *tree)
 {
   if(left)
@@ -130,17 +114,12 @@ void ArithmeticExpr::Check(Tree *tree)
 	  ReportError::IncompatibleOperands(op,left->GetType(),right->GetType());
 	}
     }  
-    }*/
+}
+
    
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
     (subscript=s)->SetParent(this);
-}
-
-void ArrayAccess::Build(Tree *tree)
-{
-  base->Build(tree);
-  subscript->Build(tree);
 }
 
 void ArrayAccess::PrintChildren(int indentLevel) {
@@ -156,15 +135,12 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     (field=f)->SetParent(this);
 }
 
-void FieldAccess::Build(Tree *tree)
-{
-  if(base) base->Build(tree);
-}
 
+/*
 Type* FieldAccess::GetType()
 {
   return new Type(field->GetName());
-}
+  }*/
 
   void FieldAccess::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
@@ -179,22 +155,12 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals=a)->SetParentAll(this);
 }
 
-void Call::Build(Tree *tree)
-{
-  if(base) base->Build(tree);
-  for(int i = 0; i < actuals->NumElements(); i++)
-    {
-      (actuals->Nth(i))->Build(tree);
-    }
-}
-
  void Call::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
     field->Print(indentLevel+1);
     actuals->PrintAll(indentLevel+1, "(actuals) ");
   }
 
-void NewExpr::Build(Tree *tree){}
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
   Assert(c != NULL);
@@ -211,32 +177,11 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     (elemType=et)->SetParent(this);
 }
 
-void NewArrayExpr::Build(Tree *tree)
-{
-  size->Build(tree);
-}
-
 void NewArrayExpr::PrintChildren(int indentLevel) {
     size->Print(indentLevel+1);
     elemType->Print(indentLevel+1);
 }
 
-
-void RelationalExpr::Build(Tree *tree){}
-
-void LogicalExpr::Build(Tree *tree){}
-
-void EqualityExpr::Build(Tree *tree){}
-
-void This::Build(Tree *tree){}
-
-void AssignExpr::Build(Tree *tree){}
-
-void ReadIntegerExpr::Build(Tree *tree){}
-
-void ReadLineExpr::Build(Tree *tree){}
-
-void LValue::Build(Tree *tree){}
 
 /*Type* FieldAccess::GetType()
 {

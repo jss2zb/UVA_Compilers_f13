@@ -31,6 +31,7 @@ class Expr : public Stmt
   virtual Type* GetType() {return Type::errorType;}
   virtual void Check() {printf("ME!\n");}
   virtual Scope* GetScope() {return parent->GetScope();};
+  virtual Identifier* GetId() {return new Identifier((*location),"ERROR");};
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -39,7 +40,7 @@ class Expr : public Stmt
 class EmptyExpr : public Expr
 {
   public:
-  Type* GetType() {return Type::voidType;};
+  Type* GetType() {return new Type("void");};
 };
 
 class IntConstant : public Expr 
@@ -50,7 +51,7 @@ class IntConstant : public Expr
   public:
     IntConstant(yyltype loc, int val);
     bool IsInt() {return true;};
-    Type* GetType() {return Type::intType;};
+    Type* GetType() {return new Type("int");};
 };
 
 class DoubleConstant : public Expr 
@@ -61,7 +62,7 @@ class DoubleConstant : public Expr
   public:
     DoubleConstant(yyltype loc, double val);
     bool IsDouble() {return true;};
-    Type* GetType() {return Type::doubleType;};
+    Type* GetType() {return new Type("double");};
 };
 
 class BoolConstant : public Expr 
@@ -72,7 +73,7 @@ class BoolConstant : public Expr
   public:
     BoolConstant(yyltype loc, bool val);
     bool IsBoolean() {return true;};
-    Type* GetType() {return Type::boolType;};
+    Type* GetType() {return new Type("bool");};
 };
 
 class StringConstant : public Expr 
@@ -83,14 +84,14 @@ class StringConstant : public Expr
   public:
     StringConstant(yyltype loc, const char *val);
     bool IsString() {return true;};
-    Type* GetType() {return Type::stringType;};
+    Type* GetType() {return new Type("string");};
 };
 
 class NullConstant: public Expr 
 {
   public: 
     NullConstant(yyltype loc) : Expr(loc) {}
-  Type* GetType() {return Type::nullType;};
+  Type* GetType() {return new Type("null");};
 };
 
 class Operator : public Node 
@@ -121,7 +122,7 @@ class ArithmeticExpr : public CompoundExpr
  ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {};
  ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {};  
   void Check();
-  Type* GetType() {return right->GetType();};
+  Type* GetType();// {return right->GetType();};
 };
 
 class RelationalExpr : public CompoundExpr 

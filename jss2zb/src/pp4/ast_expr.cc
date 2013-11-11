@@ -51,10 +51,10 @@ void ArithmeticExpr::Check()
 {
   printf("HERE!\n");
   Type* rType = right->GetType();
-  if(rType->GetName() == "Named")
+  if(strcmp(rType->GetName(),"Named"))
     {
       Scope *scope = parent->GetScope();
-      Decl *myDecl = scope->Lookup(rType->GetName
+      Decl *myDecl = scope->Lookup(right->GetId());
       rType = myDecl->GetDeclaredType();
     }
   if(left)

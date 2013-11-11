@@ -28,6 +28,8 @@ class Decl : public Node
 
     //Modified
     virtual Type* GetType() {return new Type(id->GetName());};
+    virtual void Build(Tree *tree) = 0;
+    virtual void Check(Tree *tree) = 0;
 };
 
 class VarDecl : public Decl 

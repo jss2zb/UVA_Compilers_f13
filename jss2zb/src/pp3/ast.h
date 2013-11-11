@@ -103,8 +103,8 @@ class Node
     // subclasses should override PrintChildren() instead
     void Print(int indentLevel, const char *label = NULL); 
     virtual void PrintChildren(int indentLevel)  {}
-    virtual void Build(Tree *tree) {}
-    virtual void Check(Tree *tree) {}
+    //virtual void Build(Tree *tree) {}
+    //virtual void Check(Tree *tree) {}
 };
 
 class Identifier : public Node 
