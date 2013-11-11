@@ -106,7 +106,7 @@ void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
 
 void ReportError::IncompatibleOperands(Operator *op, Type *lhs, Type *rhs) {
     stringstream s;
-    s << "Incompatible operands: " << lhs << " " << op << " " << rhs;
+    s << "Incompatible operands: " << lhs->GetIdentifier()->GetName() << " " << op->GetName() << " " << rhs->GetIdentifier()->GetName();
     OutputError(op->GetLocation(), s.str());
 }
      

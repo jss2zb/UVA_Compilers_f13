@@ -197,6 +197,7 @@ void FnDecl::Check(Tree *tree)
 	      }
 	  }
       }
+    
     if(body)
       {
 	body->Check(scope);

@@ -40,8 +40,8 @@ class Stmt : public Node
   Stmt() : Node() {};
   Stmt(yyltype loc) : Node(loc) {};
   //virtual Tree Build(Tree *tree) {return tree;}
-  void Build(Tree *tree) {};
-  void Check(Tree *tree) {};
+  virtual void Build(Tree *tree) {}
+  virtual void Check(Tree *tree) {}
 };
 
 class StmtBlock : public Stmt 

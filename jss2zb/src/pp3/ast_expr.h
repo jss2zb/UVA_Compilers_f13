@@ -108,6 +108,7 @@ class Operator : public Node
   public:
     Operator(yyltype loc, const char *tok);
     const char *GetPrintNameForNode() { return "Operator"; }
+    char* GetName() {return tokenString;};
     void PrintChildren(int indentLevel);
  };
  
@@ -122,7 +123,7 @@ class CompoundExpr : public Expr
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
     virtual void Build(Tree *tree) {}
     void PrintChildren(int indentLevel);    
-    virtual void Check(Tree *tree) {}
+    virtual void Check(Tree *tree) {printf("FAIL!\n");}
     //virtual  Type* GetType() {return new Type("ERROR");}
 };
 
@@ -134,7 +135,7 @@ class ArithmeticExpr : public CompoundExpr
   const char *GetPrintNameForNode() { return "ArithmeticExpr"; };
   void Build(Tree *tree) {}
   void Check(Tree *tree);
-  //Type* GetType();
+  Type* GetType();
 };
 
 class RelationalExpr : public CompoundExpr 
@@ -169,6 +170,7 @@ class AssignExpr : public CompoundExpr
  AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "AssignExpr"; }
     void Build(Tree *tree) {}
+    void Check(Tree *tree);
 };
 
 class LValue : public Expr 
@@ -176,7 +178,7 @@ class LValue : public Expr
   public:
  LValue(yyltype loc) : Expr(loc) {}
   void Build(Tree *tree) {}
-  //virtual //Type* GetType();
+  //Type* GetType();
   //virtual //Type* GetType() {return new Type("ERROR");};
 };
 
@@ -216,7 +218,8 @@ class FieldAccess : public LValue
     const char *GetPrintNameForNode() { return "FieldAccess"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree) {}
-    //Type* GetType();
+    void Check(Tree *tree);
+    Type* GetType();
 };
 
 /* Like field access, call is used both for qualified base.field()

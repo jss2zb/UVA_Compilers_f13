@@ -67,20 +67,6 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r) : Expr(Join(o->GetLocation(), r
     (right=r)->SetParent(this);
 }
 
-/*void CompoundExpr::Check(Tree *tree)
-{
-  Type *rType = right->GetType();
-  if(rType->GetName() 
-  if(left) 
-    {
-      Type *lType = left->GetType();
-    }
-  else
-    {
-
-    }
-    }*/
-    
 void CompoundExpr::PrintChildren(int indentLevel) 
 {
    if (left) left->Print(indentLevel+1);
@@ -89,31 +75,67 @@ void CompoundExpr::PrintChildren(int indentLevel)
    }
 
   
-/*  Type* ArithmeticExpr::GetType()
+Type* ArithmeticExpr::GetType()
 {
   if(left)
     {
-      if(strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) 
+      if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0)) 
 	{
 	  return right->GetType();
 	}
-      else if(strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0)
+      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0))
 	{
 	  return left->GetType();
+	}
+      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0))
+	{
+	  return right->GetType();
+	}
+      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0) && (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0))
+	{
+	  return right->GetType();
+	}
+      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0))
+	{
+	  return right->GetType();
+	}
+      else if((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0))
+	{
+	  return left->GetType();
+	}
+      else 
+	{
+	  return new Type("error");
 	}
     }
   return right->GetType();
   }
-*/
+
 void ArithmeticExpr::Check(Tree *tree)
 {
   if(left)
     {
-      if(!((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0)))
+      if(!((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0)) || !((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0)))
 	{
 	  ReportError::IncompatibleOperands(op,left->GetType(),right->GetType());
 	}
     }  
+}
+
+void AssignExpr::Check(Tree *tree)
+{
+  left->Check(tree);
+  right->Check(tree);
+  
+  Decl *myDecl = tree->Lookup(left->GetType()->GetIdentifier()->GetName());
+  if(myDecl)
+    {
+      Type *lType = myDecl->GetType();
+      if(!(strcmp(lType->GetIdentifier()->GetName(),right->GetType()->GetIdentifier()->GetName()) == 0))
+	{
+	  ReportError::IncompatibleOperands(op,lType,right->GetType());
+	}
+    }
 }
 
    
@@ -134,13 +156,6 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     if (base) base->SetParent(this); 
     (field=f)->SetParent(this);
 }
-
-
-/*
-Type* FieldAccess::GetType()
-{
-  return new Type(field->GetName());
-  }*/
 
   void FieldAccess::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
@@ -182,13 +197,25 @@ void NewArrayExpr::PrintChildren(int indentLevel) {
     elemType->Print(indentLevel+1);
 }
 
+void FieldAccess::Check(Tree *tree)
+{
+  if(base == NULL)
+    {
+      Decl* myDecl = tree->Lookup(field->GetName());
+      if(myDecl == NULL)
+	{
+	  reasonT t = LookingForVariable;
+	  ReportError::IdentifierNotDeclared(field,t);
+	}
+    }
+}
 
-/*Type* FieldAccess::GetType()
+Type* FieldAccess::GetType()
 {
   return new Type(field->GetName());
 }
 
-Type* ArrayAccess::GetType()
+/*Type* ArrayAccess::GetType()
 {
   return base->GetType();
   }*/
