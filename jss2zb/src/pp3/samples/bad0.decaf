@@ -1,6 +1,6 @@
 void main()
 {
-int x;
+bool x;
 
-x = 5 + true;
+x = 2 < 5;
 }

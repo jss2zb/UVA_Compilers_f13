@@ -145,6 +145,7 @@ class Type : public Node
       char* tName = typeName;
       return new Identifier(typeName);
     };
+  virtual bool isArray() {return false;}
 };
 
 

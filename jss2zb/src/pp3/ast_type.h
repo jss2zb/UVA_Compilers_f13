@@ -38,6 +38,7 @@ class ArrayType : public Type
     const char *GetPrintNameForNode() { return "ArrayType"; }
     void PrintChildren(int indentLevel);
     Identifier* GetIdentifier() {return elemType->GetIdentifier();};
+    bool isArray() {return true;};
 };
 
  

@@ -75,50 +75,49 @@ void CompoundExpr::PrintChildren(int indentLevel)
    }
 
   
-Type* ArithmeticExpr::GetType()
+Type* ArithmeticExpr::GetType(Tree *tree)
 {
   if(left)
     {
-      if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0)) 
+      if((strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"double") == 0) && (strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"double") == 0)) 
 	{
-	  return right->GetType();
+	  return right->GetType(tree);
 	}
-      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0))
+      else if((strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"int") == 0) && (strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"int") == 0))
 	{
-	  return left->GetType();
+	  return right->GetType(tree);
 	}
-      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) && (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0))
+      else if((strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"double") == 0) || (strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"int") == 0))
 	{
-	  return right->GetType();
+	  return right->GetType(tree);
 	}
-      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0) && (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0))
+      else if((strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"int") == 0))
 	{
-	  return right->GetType();
-	}
-      else if((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0))
-	{
-	  return right->GetType();
-	}
-      else if((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0))
-	{
-	  return left->GetType();
+	  return left->GetType(tree);
 	}
       else 
 	{
 	  return new Type("error");
 	}
     }
-  return right->GetType();
+  return right->GetType(tree);
   }
 
 void ArithmeticExpr::Check(Tree *tree)
 {
+  left->Check(tree);
+  right->Check(tree);
+  
   if(left)
     {
-      if(!((strcmp(left->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(left->GetType()->GetIdentifier()->GetName(),"int") == 0)) || !((strcmp(right->GetType()->GetIdentifier()->GetName(),"double") == 0) || (strcmp(right->GetType()->GetIdentifier()->GetName(),"int") == 0)))
+      if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
 	{
-	  ReportError::IncompatibleOperands(op,left->GetType(),right->GetType());
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
 	}
+      else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"double") == 0) && !(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"int") == 0))
+	{
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+	}      
     }  
 }
 
@@ -127,15 +126,62 @@ void AssignExpr::Check(Tree *tree)
   left->Check(tree);
   right->Check(tree);
   
-  Decl *myDecl = tree->Lookup(left->GetType()->GetIdentifier()->GetName());
-  if(myDecl)
+  if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
     {
-      Type *lType = myDecl->GetType();
-      if(!(strcmp(lType->GetIdentifier()->GetName(),right->GetType()->GetIdentifier()->GetName()) == 0))
+      Type *lType = left->GetType(tree);
+      Type *rType = right->GetType(tree);
+      if(lType->isArray())
 	{
-	  ReportError::IncompatibleOperands(op,lType,right->GetType());
+	  lType = new Type(strcat(lType->GetIdentifier()->GetName(),"[]"));
 	}
+      
+      if(rType->isArray())
+        {
+          rType = new Type(strcat(rType->GetIdentifier()->GetName(),"[]"));
+        }
+      ReportError::IncompatibleOperands(op,lType,rType);
     }
+}
+
+void RelationalExpr::Check(Tree *tree)
+{
+  left->Check(tree);
+  right->Check(tree);
+  
+  if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
+    {
+      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+    }
+  else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"int")==0) && !(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"double")==0))
+    {
+      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+    }
+}
+
+Type* RelationalExpr::GetType(Tree *tree)
+{
+  return new Type("bool");
+}
+
+void LogicalExpr::Check(Tree *tree)
+{
+  left->Check(tree);
+  right->Check(tree);
+  
+  if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
+    {
+      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+    }
+  else if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),"bool")==0))
+    {
+      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+    }
+
+}
+
+Type* LogicalExpr::GetType(Tree *tree)
+{
+  return new Type("bool");
 }
 
    
@@ -210,12 +256,52 @@ void FieldAccess::Check(Tree *tree)
     }
 }
 
-Type* FieldAccess::GetType()
+Type* FieldAccess::GetType(Tree *tree)
 {
-  return new Type(field->GetName());
+  Decl *myDecl = tree->Lookup(field->GetName());
+  Type *myT;
+  if(myDecl == NULL)
+    {
+      myT = new Type("error");
+    }
+  else
+    {
+      myT = myDecl->GetType();
+    }
+  return myT;
 }
 
-/*Type* ArrayAccess::GetType()
+void ArrayAccess::Check(Tree *tree)
 {
-  return base->GetType();
-  }*/
+  base->Check(tree);
+  subscript->Check(tree);
+  if(!(strcmp(subscript->GetType(tree)->GetIdentifier()->GetName(),"int")==0))
+    {
+      ReportError::SubscriptNotInteger(subscript);
+    }
+  
+  if(!(base->GetType(tree)->isArray()))
+    {
+      ReportError::BracketsOnNonArray(base);
+    }
+}
+
+Type* ArrayAccess::GetType(Tree *tree)
+{
+  return base->GetType(tree);
+}
+
+void NewArrayExpr::Check(Tree *tree)
+{
+  size->Check(tree);
+  
+  if(!(strcmp(size->GetType(tree)->GetIdentifier()->GetName(),"int")==0))
+    {
+      ReportError::NewArraySizeNotInteger(size);
+    }
+}
+
+Type* NewArrayExpr::GetType(Tree *tree)
+{
+  return new ArrayType((*location),elemType);
+}

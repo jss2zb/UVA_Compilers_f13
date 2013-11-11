@@ -56,8 +56,11 @@ char* MyType::GetName()
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
-    (elemType=et)->SetParent(this);
+    //    elemType = new Type(strcat(et->GetIdentifier()->GetName(),"[]"));
+    elemType = et;
+    elemType->SetParent(this);
 }
+
 void ArrayType::PrintChildren(int indentLevel) {
     elemType->Print(indentLevel+1);
 }
