@@ -293,6 +293,10 @@ Type* Call::GetType(Tree *tree)
 {
   if(base)
     {
+      if(base->GetType(tree)->isArray() && strcmp(field->GetName(),"length")==0)
+	{
+	  return new Type("int");
+	}
       Decl *myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
       if(myDecl != NULL)
 	{
@@ -354,9 +358,14 @@ void FieldAccess::Check(Tree *tree)
 	  reasonT t = LookingForVariable;
 	  ReportError::IdentifierNotDeclared(field,t);
 	}
+      else if(myDecl->IsFunction())
+	{
+	  reasonT t = LookingForVariable;
+	  ReportError::IdentifierNotDeclared(field,t);
+	}
     }
   else
-    {
+    { 
       Decl* myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
       if(myDecl)
 	{
@@ -391,6 +400,10 @@ Type* FieldAccess::GetType(Tree *tree)
   Decl *myDecl = tree->Lookup(field->GetName());
   Type *myT;
   if(myDecl == NULL)
+    {
+      myT = new Type("error");
+    }
+  else if(myDecl->IsFunction())
     {
       myT = new Type("error");
     }
@@ -429,6 +442,19 @@ void NewArrayExpr::Check(Tree *tree)
     {
       ReportError::NewArraySizeNotInteger(size);
     }
+
+  Decl *myDecl = tree->Lookup(elemType->GetIdentifier()->GetName());
+  if(myDecl == NULL)
+    {
+      reasonT t = LookingForClass;
+      ReportError::IdentifierNotDeclared(elemType->GetIdentifier(),t);
+    }
+  else if(!myDecl->IsClass())
+    {
+      reasonT t = LookingForClass;
+      ReportError::IdentifierNotDeclared(elemType->GetIdentifier(),t);
+    }
+
 }
 
 Type* NewArrayExpr::GetType(Tree *tree)
@@ -471,4 +497,24 @@ void EqualityExpr::Check(Tree *tree)
 Type* EqualityExpr::GetType(Tree *tree)
 {
   return new Type("bool");
+}
+
+void NewExpr::Check(Tree *tree)
+{
+  Decl *myDecl = tree->Lookup(cType->GetIdentifier()->GetName());
+  if(myDecl == NULL)
+    {
+      reasonT t = LookingForClass;
+      ReportError::IdentifierNotDeclared(cType->GetIdentifier(),t);
+    }
+  else if(!myDecl->IsClass())
+    {
+      reasonT t = LookingForClass;
+      ReportError::IdentifierNotDeclared(cType->GetIdentifier(),t);
+    }
+}
+
+Type* NewExpr::GetType(Tree *tree)
+{
+  return cType;
 }

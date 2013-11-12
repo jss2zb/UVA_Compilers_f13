@@ -149,6 +149,7 @@ class PrintStmt : public Stmt
     const char *GetPrintNameForNode() { return "PrintStmt"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree);
+    void Check(Tree *tree);
 };
 
 

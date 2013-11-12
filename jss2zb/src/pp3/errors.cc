@@ -168,7 +168,7 @@ void ReportError::InaccessibleField(Identifier *field, Type *base) {
 
 void ReportError::PrintArgMismatch(Expr *arg, int argIndex, Type *given) {
     stringstream s;
-    s << "Incompatible argument " << argIndex << ": " << given
+    s << "Incompatible argument " << argIndex << ": " << given->GetIdentifier()->GetName()
         << " given, int/bool/string expected";
     OutputError(arg->GetLocation(), s.str());
 }

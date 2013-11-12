@@ -41,6 +41,11 @@ void VarDecl::Check(Tree *tree)
 	  reasonT t = LookingForType;
 	  ReportError::IdentifierNotDeclared(type->GetIdentifier(),t);
 	}
+      else if(!myDecl->IsClass())
+	{
+	  reasonT t = LookingForType;
+	  ReportError::IdentifierNotDeclared(type->GetIdentifier(),t);
+	}
     }
 }
  
@@ -79,13 +84,16 @@ void ClassDecl::Build(Tree *tree)
   if(extends)
     {
       temp = tree->LocalLookup(extends->GetIdentifier()->GetName());
-      List<Decl*> *t = temp->GetMembers();
-      for(int i = 0; i < t->NumElements();i++)
+      if(temp)
 	{
-	  t->Nth(i)->Build(theTree);
-	  if(t->Nth(i)->IsFunction())
+	  List<Decl*> *t = temp->GetMembers();
+	  for(int i = 0; i < t->NumElements();i++)
 	    {
-	      members->Append(t->Nth(i));
+	      t->Nth(i)->Build(theTree);
+	      if(t->Nth(i)->IsFunction())
+		{
+		  members->Append(t->Nth(i));
+		}
 	    }
 	}
     }
@@ -106,11 +114,16 @@ void ClassDecl::Check(Tree *tree)
     }
   for(int i = 0; i < implements->NumElements(); i++)
     {
-      Decl* myDecl = tree->Lookup((implements->Nth(i))->GetName()->GetName());
+      Decl* myDecl = tree->Lookup(implements->Nth(i)->GetIdentifier()->GetName());
       if(myDecl == NULL)
 	{
 	  reasonT t = LookingForInterface;
 	  ReportError::IdentifierNotDeclared((implements->Nth(i))->GetName(),t);
+	}
+      else if(!myDecl->IsInterface())
+	{
+	  reasonT t = LookingForInterface;
+	  ReportError::IdentifierNotDeclared((implements->Nth(i))->GetIdentifier(),t);
 	}
     }
   for(int i = 0; i < members->NumElements(); i++)

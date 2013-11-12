@@ -205,6 +205,17 @@ void PrintStmt::Build(Tree *tree)
       (args->Nth(i))->Build(tree);
     }
 }
+
+void PrintStmt::Check(Tree *tree)
+{
+  for(int i=0; i < args->NumElements(); i++)
+    {
+      if(strcmp(args->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),"double")==0)
+	{
+	  ReportError::PrintArgMismatch(args->Nth(i),i+1,args->Nth(i)->GetType(tree));
+	}
+    }
+}
   
 PrintStmt::PrintStmt(List<Expr*> *a) {    
     Assert(a != NULL);

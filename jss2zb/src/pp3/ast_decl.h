@@ -37,6 +37,8 @@ class Decl : public Node
     virtual List<VarDecl*>* GetFormals() {return new List<VarDecl*>;}
     virtual List<Decl*>* GetMembers() {return new List<Decl*>;}
     virtual bool IsFunction() {return false;}
+    virtual bool IsInterface() {return false;}
+    virtual bool IsClass() {return false;}
 };
 
 class VarDecl : public Decl 
@@ -77,6 +79,7 @@ class ClassDecl : public Decl
     Type* GetClass() {return new Type(id->GetName());}
     bool hasMembers(Identifier *id);
     List<Decl*>* GetMembers(){return members;};
+    bool IsClass() {return true;};
 };
 
 class InterfaceDecl : public Decl 
@@ -93,6 +96,7 @@ class InterfaceDecl : public Decl
     Tree* GetScope() {return NULL;};
     Identifier* GetName() {return id;};
     bool hasMembers(Identifier *id);
+    bool IsInterface() {return true;};
 };
 
 class FnDecl : public Decl 

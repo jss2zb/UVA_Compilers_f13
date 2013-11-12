@@ -80,13 +80,13 @@ void yyerror(const char *msg); // standard error-handling routine
 %token   <doubleConstant> T_DoubleConstant
 %token   <boolConstant> T_BoolConstant
 
-
-%left '='
-%left '.' '['
-%left '+' '-'
-%left '*' '/' '%'
-%left T_And T_Or '!'
 %left T_LessEqual T_GreaterEqual T_Equal T_NotEqual '<' '>'
+%left T_And T_Or '!'
+%left '*' '/' '%'
+%left '+' '-'
+%left '.' '['
+%left '='
+
 %nonassoc THEN 
 %nonassoc T_Else
 

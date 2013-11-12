@@ -261,6 +261,8 @@ class NewExpr : public Expr
     const char *GetPrintNameForNode() { return "NewExpr"; }
     void PrintChildren(int indentLevel);
     void Build(Tree *tree) {}
+    void Check(Tree *tree);
+    Type* GetType(Tree *tree);
 };
 
 class NewArrayExpr : public Expr
