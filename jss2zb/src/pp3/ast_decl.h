@@ -16,6 +16,7 @@ class Type;
 class NamedType;
 class Identifier;
 class Stmt;
+class ReturnStmt;
 
 class Decl : public Node 
 {
@@ -106,7 +107,7 @@ class FnDecl : public Decl
     void Check(Tree *tree);
     Identifier* GetName() {return id;};
     Tree* GetScope() {return NULL;};
-    Type* GetType() {return returnType;};
+    void CheckReturn(ReturnStmt *r, Type *t);
     bool hasMembers(Identifier *id) {return false;}
 };
 

@@ -150,7 +150,7 @@ void ReportError::ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expect
 
 void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected) {
     stringstream s;
-    s << "Incompatible return: " << given << " given, " << expected << " expected";
+    s << "Incompatible return: " << given->GetIdentifier()->GetName() << " given, " << expected->GetIdentifier()->GetName() << " expected";
     OutputError(rStmt->GetLocation(), s.str());
 }
 

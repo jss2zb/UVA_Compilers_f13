@@ -176,10 +176,15 @@ void ReturnStmt::Build(Tree *tree)
 void ReturnStmt::Check(Tree *tree)
 {
   expr->Check(tree);
-  /*if(!(strcmp(this->GetType()->GetIdentifier()->GetName(),expr->GetType(tree)->GetIdentifier()->GetName()) == 0))
+
+  this->CheckReturn(this,expr->GetType(tree));
+    /*
+  printf("her\n");
+  if(!this->CheckReturn(expr->GetType(tree)))
     {
       ReportError::ReturnMismatch(this,this->GetType(),expr->GetType(tree));
-      }*/
+    }
+    */
 }
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 

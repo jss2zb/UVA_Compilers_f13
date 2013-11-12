@@ -233,6 +233,15 @@ void FnDecl::Check(Tree *tree)
       }
   }
 
+void FnDecl::CheckReturn(ReturnStmt *r, Type *t)
+{
+  if(!(strcmp("int",returnType->GetIdentifier()->GetName()) == 0))
+    {
+      ReportError::ReturnMismatch(r,t,returnType);
+    }
+
+}
+
 void FnDecl::SetFunctionBody(Stmt *b) { 
     (body=b)->SetParent(this);
 }

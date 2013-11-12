@@ -174,7 +174,6 @@ Type* RelationalExpr::GetType(Tree *tree)
 
 void LogicalExpr::Check(Tree *tree)
 {
-  printf("HERE!\n");
   if(left) left->Check(tree);
   right->Check(tree);
   
@@ -191,7 +190,6 @@ void LogicalExpr::Check(Tree *tree)
     }
   else
     {
-      printf("UNARY\n");
       if(!(strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"bool")==0))
 	{
 	  ReportError::IncompatibleOperand(op,right->GetType(tree));
@@ -341,7 +339,6 @@ void FieldAccess::Check(Tree *tree)
     }
   else
     {
-      printf("%s\n",base->GetType(tree)->GetIdentifier()->GetName());
       Decl* myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
       if(myDecl)
 	{
@@ -429,4 +426,19 @@ Type* This::GetType(Tree *tree)
     }
   return tType;
   
+}
+
+void EqualityExpr::Check(Tree *tree)
+{
+  left->Check(tree);
+  right->Check(tree);
+  if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
+    {
+      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+    }
+}
+
+Type* EqualityExpr::GetType(Tree *tree)
+{
+  return new Type("bool");
 }

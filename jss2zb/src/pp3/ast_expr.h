@@ -23,7 +23,7 @@ class Expr : public Stmt
   public:
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
-    virtual Type* GetType(Tree *tree) {return Type::errorType;}
+  virtual Type* GetType(Tree *tree) {return new Type("error");}
     //    virtual void Check(Tree *tree) {printf("error");}
 };
 
@@ -36,7 +36,7 @@ class EmptyExpr : public Expr
     const char *GetPrintNameForNode() { return "Empty"; }
     void Build(Tree *tree) {}
     void Check(Tree *tree) {}
-    Type* GetType(Tree *tree) {return Type::voidType;};
+    Type* GetType(Tree *tree) {return new Type("void");};
 };
 
 class IntConstant : public Expr 
@@ -154,6 +154,8 @@ class EqualityExpr : public CompoundExpr
  EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "EqualityExpr"; }
     void Build(Tree *tree) {}
+    void Check(Tree *tree);
+    Type* GetType(Tree *tree);
 };
 
 class LogicalExpr : public CompoundExpr 

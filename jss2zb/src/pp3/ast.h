@@ -39,6 +39,7 @@
 class Identifier;
 class Type;
 class Decl;
+class ReturnStmt;
 
 class MyType
 {
@@ -106,13 +107,12 @@ class Node
       return NULL;
     }
     
-    virtual Type* GetType()
+    virtual void CheckReturn(ReturnStmt *r, Type *t)
     {
       if(parent)
 	{
-	  parent->GetType();
+	  return parent->CheckReturn(r,t);
 	}
-      return NULL;
     }
 
     virtual const char *GetPrintNameForNode() = 0;
@@ -161,8 +161,8 @@ class Type : public Node
   virtual Identifier* GetIdentifier() 
     {       
       char* tName = typeName;
-      return new Identifier(typeName);
-    };
+      return new Identifier(tName);
+    }
   virtual bool isArray() {return false;}
 };
 
