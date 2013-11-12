@@ -35,6 +35,8 @@ class Decl : public Node
     virtual bool hasMembers(Identifier *id) = 0;
     virtual Tree* GetScope() = 0;
     virtual List<VarDecl*>* GetFormals() {return new List<VarDecl*>;}
+    virtual List<Decl*>* GetMembers() {return new List<Decl*>;}
+    virtual bool IsFunction() {return false;}
 };
 
 class VarDecl : public Decl 
@@ -74,6 +76,7 @@ class ClassDecl : public Decl
     Tree* GetScope() {return scope;};
     Type* GetClass() {return new Type(id->GetName());}
     bool hasMembers(Identifier *id);
+    List<Decl*>* GetMembers(){return members;};
 };
 
 class InterfaceDecl : public Decl 
@@ -113,6 +116,7 @@ class FnDecl : public Decl
     void CheckReturn(ReturnStmt *r, Type *t);
     bool hasMembers(Identifier *id) {return false;}
     List<VarDecl*>* GetFormals() {return formals;};
+    bool IsFunction() {return true;};
 };
 
 #endif

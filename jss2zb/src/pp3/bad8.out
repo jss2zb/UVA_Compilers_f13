@@ -1,0 +1,92 @@
+
+   Program: 
+  1   ClassDecl: 
+  1      Identifier: Car
+  2      VarDecl: 
+            Type: int
+  2         Identifier: wheels
+  3      FnDecl: 
+            (return type) Type: void
+  3         Identifier: Drive
+            (body) StmtBlock: 
+  6   ClassDecl: 
+  6      Identifier: Honda
+  6      (extends) NamedType: 
+  6         Identifier: Car
+  7      VarDecl: 
+            Type: int
+  7         Identifier: trunk
+  8      FnDecl: 
+            (return type) Type: bool
+  8         Identifier: Park
+            (body) StmtBlock: 
+  8            ReturnStmt: 
+  8               EqualityExpr: 
+  8                  FieldAccess: 
+  8                     Identifier: trunk
+  8                  Operator: ==
+  8                  FieldAccess: 
+  8                     Identifier: wheels
+ 11   ClassDecl: 
+ 11      Identifier: Boat
+ 13   FnDecl: 
+         (return type) Type: void
+ 13      Identifier: main
+         (body) StmtBlock: 
+ 14         VarDecl: 
+ 14            NamedType: 
+ 14               Identifier: Honda
+ 14            Identifier: red
+ 15         VarDecl: 
+ 15            NamedType: 
+ 15               Identifier: Boat
+ 15            Identifier: blue
+ 17         AssignExpr: 
+ 17            FieldAccess: 
+ 17               Identifier: red
+ 17            Operator: =
+ 17            NewExpr: 
+ 17               NamedType: 
+ 17                  Identifier: Honda
+ 18         AssignExpr: 
+ 18            FieldAccess: 
+ 18               FieldAccess: 
+ 18                  Identifier: red
+ 18               Identifier: wheels
+ 18            Operator: =
+ 18            IntConstant: 2
+            IfStmt: 
+ 19            (test) Call: 
+ 19               FieldAccess: 
+ 19                  Identifier: red
+ 19               Identifier: Park
+ 20            (then) AssignExpr: 
+ 20               FieldAccess: 
+ 20                  FieldAccess: 
+ 20                     Identifier: red
+ 20                  Identifier: horn
+ 20               Operator: =
+ 20               DoubleConstant: 1
+ 21         Call: 
+ 21            FieldAccess: 
+ 21               Identifier: red
+ 21            Identifier: Honk
+ 22         AssignExpr: 
+ 22            FieldAccess: 
+ 22               Identifier: red
+ 22            Operator: =
+ 22            LogicalExpr: 
+ 22               RelationalExpr: 
+ 22                  FieldAccess: 
+ 22                     Identifier: blue
+ 22                  Operator: <
+ 22                  FieldAccess: 
+ 22                     Identifier: red
+ 22               Operator: &&
+ 22               EqualityExpr: 
+ 22                  FieldAccess: 
+ 22                     Identifier: blue
+ 22                  Operator: ==
+ 22                  NullConstant: 
+HERE!
+HERE!

@@ -75,6 +75,20 @@ void ClassDecl::Build(Tree *tree)
     {
       (members->Nth(i))->Build(theTree);
     }
+
+  if(extends)
+    {
+      temp = tree->LocalLookup(extends->GetIdentifier()->GetName());
+      List<Decl*> *t = temp->GetMembers();
+      for(int i = 0; i < t->NumElements();i++)
+	{
+	  t->Nth(i)->Build(theTree);
+	  if(t->Nth(i)->IsFunction())
+	    {
+	      members->Append(t->Nth(i));
+	    }
+	}
+    }
   scope = theTree;
   tree->InsertChild(theTree);
 }
@@ -235,7 +249,7 @@ void FnDecl::Check(Tree *tree)
 
 void FnDecl::CheckReturn(ReturnStmt *r, Type *t)
 {
-  if(!(strcmp("int",returnType->GetIdentifier()->GetName()) == 0))
+  if(!(strcmp(t->GetIdentifier()->GetName(),returnType->GetIdentifier()->GetName()) == 0))
     {
       ReportError::ReturnMismatch(r,t,returnType);
     }

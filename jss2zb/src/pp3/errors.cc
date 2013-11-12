@@ -162,7 +162,7 @@ void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
      
 void ReportError::InaccessibleField(Identifier *field, Type *base) {
     stringstream s;
-    s  << base << " field '" << field << "' only accessible within class scope";
+    s  << base->GetIdentifier()->GetName() << " field '" << field->GetName() << "' only accessible within class scope";
     OutputError(field->GetLocation(), s.str());
 }
 

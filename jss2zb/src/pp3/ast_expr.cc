@@ -360,14 +360,23 @@ void FieldAccess::Check(Tree *tree)
       Decl* myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
       if(myDecl)
 	{
-	  if(!myDecl->hasMembers(base->GetType(tree)->GetIdentifier()))
+	  Decl *tDecl = myDecl->GetScope()->Lookup(field->GetName());
+	  if(!myDecl->hasMembers(field))
 	    {
-	      ReportError::FieldNotFoundInBase(field,base->GetType(tree));
+	      if(tDecl != NULL)
+		{
+		  ReportError::InaccessibleField(field,base->GetType(tree));
+		}
+	      else
+		{
+		  ReportError::FieldNotFoundInBase(field,base->GetType(tree));
+		}
 	    }
 	}
       else
 	{
 	  Type *lType = base->GetType(tree);
+	  printf("THERE!\n");
 	  if(lType->isArray())
 	    {
 	      lType = new Type(strcat(lType->GetIdentifier()->GetName(),"[]"));
@@ -452,7 +461,10 @@ void EqualityExpr::Check(Tree *tree)
   right->Check(tree);
   if(!(strcmp(left->GetType(tree)->GetIdentifier()->GetName(),right->GetType(tree)->GetIdentifier()->GetName()) == 0))
     {
-      ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+      if(!(strcmp(right->GetType(tree)->GetIdentifier()->GetName(),"null") == 0))
+	{
+	  ReportError::IncompatibleOperands(op,left->GetType(tree),right->GetType(tree));
+	}
     }
 }
 
