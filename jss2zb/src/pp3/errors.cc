@@ -137,14 +137,14 @@ void ReportError::NewArraySizeNotInteger(Expr *sizeExpr) {
 
 void ReportError::NumArgsMismatch(Identifier *fnIdent, int numExpected, int numGiven) {
     stringstream s;
-    s << "Function '"<< fnIdent << "' expects " << numExpected << " argument" << (numExpected==1?"":"s") 
+    s << "Function '"<< fnIdent->GetName() << "' expects " << numExpected << " argument" << (numExpected==1?"":"s") 
       << " but " << numGiven << " given";
     OutputError(fnIdent->GetLocation(), s.str());
 }
 
 void ReportError::ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expected) {
   stringstream s;
-  s << "Incompatible argument " << argIndex << ": " << given << " given, " << expected << " expected";
+  s << "Incompatible argument " << argIndex << ": " << given->GetIdentifier()->GetName() << " given, " << expected->GetIdentifier()->GetName() << " expected";
   OutputError(arg->GetLocation(), s.str());
 }
 

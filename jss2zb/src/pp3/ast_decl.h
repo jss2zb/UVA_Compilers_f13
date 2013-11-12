@@ -17,6 +17,7 @@ class NamedType;
 class Identifier;
 class Stmt;
 class ReturnStmt;
+class VarDecl;
 
 class Decl : public Node 
 {
@@ -33,6 +34,7 @@ class Decl : public Node
     virtual void Check(Tree *tree) = 0;
     virtual bool hasMembers(Identifier *id) = 0;
     virtual Tree* GetScope() = 0;
+    virtual List<VarDecl*>* GetFormals() {return new List<VarDecl*>;}
 };
 
 class VarDecl : public Decl 
@@ -106,9 +108,11 @@ class FnDecl : public Decl
     void Build(Tree *tree);
     void Check(Tree *tree);
     Identifier* GetName() {return id;};
+    Type* GetType() {return returnType;};
     Tree* GetScope() {return NULL;};
     void CheckReturn(ReturnStmt *r, Type *t);
     bool hasMembers(Identifier *id) {return false;}
+    List<VarDecl*>* GetFormals() {return formals;};
 };
 
 #endif

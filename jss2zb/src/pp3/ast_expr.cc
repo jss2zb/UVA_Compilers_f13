@@ -242,9 +242,10 @@ void Call::Check(Tree *tree)
       actuals->Nth(i)->Check(tree);
     }
 
+  Decl *myDecl;
   if(base)
     {
-      Decl *myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
+      myDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
       if(myDecl == NULL)
 	{
 	  reasonT t = LookingForClass;
@@ -260,13 +261,30 @@ void Call::Check(Tree *tree)
     }
   else
     {
-      
-      Decl *myDecl = tree->Lookup(field->GetName());
+      myDecl = tree->Lookup(field->GetName());
       
       if(myDecl == NULL)
 	{
 	  reasonT t = LookingForFunction;
 	  ReportError::IdentifierNotDeclared(field,t);
+	}
+    }
+
+  if(myDecl)
+    {
+      if(actuals->NumElements() != myDecl->GetFormals()->NumElements())
+	{
+	  ReportError::NumArgsMismatch(field, myDecl->GetFormals()->NumElements(),actuals->NumElements());
+	}
+      else
+	{
+	  for(int i = 0; i < actuals->NumElements(); i++)
+	    {
+	      if(!(strcmp(actuals->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),myDecl->GetFormals()->Nth(i)->GetType()->GetIdentifier()->GetName()) == 0))
+		{
+		  ReportError::ArgMismatch(this,i+1,actuals->Nth(i)->GetType(tree),myDecl->GetFormals()->Nth(i)->GetType());
+		}
+	    }
 	}
     }
 }
