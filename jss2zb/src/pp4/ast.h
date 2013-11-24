@@ -51,7 +51,6 @@ class Node
     typedef enum { kShallow, kDeep } lookup;
     virtual Decl *FindDecl(Identifier *id, lookup l = kDeep);
     virtual Scope *PrepareScope() { return NULL; }
-    virtual Scope* GetScope() {return nodeScope;};
 };
    
 
@@ -63,7 +62,6 @@ class Identifier : public Node
     
   public:
     Identifier(yyltype loc, const char *name);
-    Identifier(const char *n);
     friend std::ostream& operator<<(std::ostream& out, Identifier *id) { return out << id->name; }
     const char *GetName() { return name; }
 };

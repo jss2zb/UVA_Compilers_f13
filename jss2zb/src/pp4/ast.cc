@@ -35,11 +35,5 @@ Decl *Node::FindDecl(Identifier *idToFind, lookup l) {
 Identifier::Identifier(yyltype loc, const char *n) : Node(loc) {
     name = strdup(n);
     cached = NULL;
-}
-
-Identifier::Identifier(const char *n) : Node() 
-{
-  name = strdup(n);
-  cached = NULL;
-}
+} 
 

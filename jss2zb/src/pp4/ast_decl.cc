@@ -15,8 +15,8 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
 }
 
 bool Decl::ConflictsWithPrevious(Decl *prev) {
-  ReportError::DeclConflict(this, prev);
-  return true;
+    ReportError::DeclConflict(this, prev);
+    return true;
 }
 
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {

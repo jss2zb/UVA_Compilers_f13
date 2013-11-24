@@ -11,11 +11,10 @@
 
 #include "ast.h"
 #include "list.h"
-#include "ast_type.h"
 
-//class Type;
-//class NamedType;
-//class Identifier;
+class Type;
+class NamedType;
+class Identifier;
 class Stmt;
 class FnDecl;
 class InterfaceDecl;
@@ -38,7 +37,6 @@ class Decl : public Node
     virtual bool IsInterfaceDecl() { return false; }
     virtual bool IsFnDecl() { return false; } 
     virtual bool IsMethodDecl() { return false; }
-    virtual Type *GetDeclaredType() {return new Type("ERROR");}    
 };
 
 class VarDecl : public Decl 
@@ -50,7 +48,6 @@ class VarDecl : public Decl
     VarDecl(Identifier *name, Type *type);
     void Check();
     Type *GetDeclaredType() { return type; }
-    Scope* GetScope() {return parent->GetScope();};
 };
 
 class ClassDecl : public Decl 

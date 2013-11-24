@@ -32,7 +32,6 @@ class Stmt : public Node
   public:
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
-  void Check() {printf("STMT!\n");};
 };
 
 class StmtBlock : public Stmt 

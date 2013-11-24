@@ -26,12 +26,10 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
 }
-
 void StmtBlock::Check() {
     nodeScope = new Scope();
     decls->DeclareAll(nodeScope);
     decls->CheckAll();
-    printf("STMTS\n");
     stmts->CheckAll();
 }
 
@@ -56,12 +54,9 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     elseBody = eb;
     if (elseBody) elseBody->SetParent(this);
 }
-
-void IfStmt::Check() 
-{
-  ConditionalStmt::Check();
-  test->Check();
-  if (elseBody) elseBody->Check();
+void IfStmt::Check() {
+    ConditionalStmt::Check();
+    if (elseBody) elseBody->Check();
 }
 
 

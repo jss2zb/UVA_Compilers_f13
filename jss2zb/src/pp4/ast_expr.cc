@@ -47,34 +47,7 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right=r)->SetParent(this);
 }
    
-void ArithmeticExpr::Check()
-{
-  printf("HERE!\n");
-  Type* rType = right->GetType();
-  if(strcmp(rType->GetName(),"Named"))
-    {
-      Scope *scope = parent->GetScope();
-      Decl *myDecl = scope->Lookup(right->GetId());
-      rType = myDecl->GetDeclaredType();
-    }
-  if(left)
-    {
-      Type* lType = left->GetType();
-
-      if(!(lType->IsEquivalentTo(Type::intType) || lType->IsEquivalentTo(Type::doubleType)) || !(rType->IsEquivalentTo(Type::intType) || rType->IsEquivalentTo(Type::doubleType)))
-	{
-	  ReportError::IncompatibleOperands(op,lType,rType);
-	}
-    }
-  else
-    {
-      if(!(rType->IsEquivalentTo(Type::intType) || rType->IsEquivalentTo(Type::doubleType)))
-	{
-	  ReportError::IncompatibleOperand(op,rType);
-	}
-    }
-}
-
+  
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
     (subscript=s)->SetParent(this);
@@ -89,18 +62,6 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 
-void AssignExpr::Check()
-{
-  printf("HERE=!\n");
-  right->Check();
-  left->Check();
-  if(!(left->GetType()->IsEquivalentTo(right->GetType())))
-    {
-      ReportError::IncompatibleOperands(op,left->GetType(),right->GetType());
-    }
-}
-
-
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
     base = b;
@@ -108,18 +69,7 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (field=f)->SetParent(this);
     (actuals=a)->SetParentAll(this);
 }
-
-void Call::Check()
-{
-    
-  /*  Decl* myDecl = scope->Lookup(field);
-  if(myDecl == NULL)
-    {
-      reasonT t = LookingForFunction;
-      ReportError::IdentitifierNotDeclared(field,t);
-    }
-  */
-} 
+ 
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
   Assert(c != NULL);

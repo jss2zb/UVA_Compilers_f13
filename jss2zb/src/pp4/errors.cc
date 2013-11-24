@@ -26,7 +26,8 @@ void ReportError::UnderlineErrorInLine(const char *line, yyltype *pos) {
     cerr << endl;
 }
 
-
+ 
+ 
 void ReportError::OutputError(yyltype *loc, string msg) {
     numErrors++;
     fflush(stdout); // make sure any buffered text has been output
