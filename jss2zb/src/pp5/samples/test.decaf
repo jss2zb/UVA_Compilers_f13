@@ -1,0 +1,13 @@
+
+void main()
+{
+int x;
+for(x = 5; x > 0; x = x-1)
+{
+  if(x != 2)
+  {
+  Print(x);
+  }
+}
+
+}

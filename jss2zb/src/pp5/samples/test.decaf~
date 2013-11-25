@@ -1,0 +1,14 @@
+
+void main()
+{
+int x;
+for(x = 5; x > 0; x = x-1)
+{
+  Print(x);
+  if(x == 2)
+  {
+  break;
+  }
+}
+
+}
