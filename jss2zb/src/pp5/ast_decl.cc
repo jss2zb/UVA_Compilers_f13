@@ -42,6 +42,12 @@ Location* VarDecl::Emit(CodeGenerator *cg)
   label = cg->GenGlobVar(id->GetName());
   return label;
 }
+
+Location* VarDecl::ParamEmit(CodeGenerator *cg, int i)
+{
+  label = cg->GenParam(id->GetName(),i);
+  return label;
+}
  
 void VarDecl::PrintChildren(int indentLevel) { 
    type->Print(indentLevel+1);
@@ -204,16 +210,33 @@ void FnDecl::Build(Tree *tree)
 
 Location* FnDecl::Emit(Tree *tree,CodeGenerator *cg)
   {
-    cg->GenLabel(id->GetName());
+    if(strcmp(id->GetName(),"main") == 0)
+      {
+	cg->GenLabel(id->GetName());
+      }
+    else
+      {
+       const char *c = "_";
+       size_t len1 = strlen(c);
+       size_t len2 = strlen(id->GetName());
+       char *f = (char*)malloc(len1+len2+1);
+       strcpy(f,c);
+       strcat(f,id->GetName());
+       f[len1+len2] = '\0';
+       cg->GenLabel(f);
+      }
     BeginFunc *bg = cg->GenBeginFunc();
     int start = cg->GetLocalCount();    
+    for(int i = 0; i < formals->NumElements(); i++)
+      {
+	formals->Nth(i)->ParamEmit(cg,i);
+      }
     if(body)
       {
 	body->Emit(scope,cg);
       }
     cg->GenEndFunc();
     bg->SetFrameSize((cg->GetLocalCount()-start)*4);
-    cg->DoFinalCodeGen();
     return NULL;
   }
 

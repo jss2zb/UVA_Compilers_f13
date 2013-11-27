@@ -58,6 +58,7 @@ class CodeGenerator {
     Location *GenTempVar();
     Location *GenLocVar(const char *str);
     Location *GenGlobVar(const char *str);
+    Location *GenParam(const char *str,int i);
          // Generates Tac instructions to load a constant value. Creates
          // a new temp var to hold the result. The constant 
          // value is passed as an integer, it can be 0 for integer zero,

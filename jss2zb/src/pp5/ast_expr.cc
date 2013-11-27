@@ -241,7 +241,29 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 
 Location* Call::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return NULL;
+  Location *loc;
+  if(base == NULL)
+    {
+      for(int i = actuals->NumElements()-1; i >= 0; i--)
+	{
+	  cg->GenPushParam(actuals->Nth(i)->Emit(tree,cg));
+	}
+      bool hasReturn = true;
+      if(strcmp(tree->Lookup(field->GetName())->GetType()->GetIdentifier()->GetName(),"void") == 0)
+	{
+	  hasReturn = false;
+	}
+      const char *c = "_";
+      size_t len1 = strlen(c);
+      size_t len2 = strlen(field->GetName());
+      char *f = (char*)malloc(len1+len2+1);
+      strcpy(f,c);
+      strcat(f,field->GetName());
+      f[len1+len2] = '\0';
+      loc = cg->GenLCall(f,hasReturn);
+      cg->GenPopParams(4*actuals->NumElements());
+    }
+  return loc;
 }
 
 Type* Call::GetType(Tree *tree)

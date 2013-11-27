@@ -40,6 +40,7 @@ class Decl : public Node
     virtual bool IsFunction() {return false;}
     virtual bool IsInterface() {return false;}
     virtual bool IsClass() {return false;}
+    virtual bool IsVarDecl() {return false;}
     virtual Location* GetLabel() {return NULL;}
     virtual Location* Emit(CodeGenerator *cg) {return NULL;}
 };
@@ -57,12 +58,15 @@ class VarDecl : public Decl
     void Build(Tree *tree);
     Location* Emit(Tree *tree,CodeGenerator *cg);
     Location* Emit(CodeGenerator *cg);
+    Location* ParamEmit(CodeGenerator *cg, int i);
     Identifier* GetName() {return id;};
     //Modified
     Tree* GetScope() {return NULL;};
     Type* GetType() {return type;};
     bool hasMembers(Identifier *id) {return false;};
+    bool IsVarDecl() {return true;};
     Location* GetLabel() {return label;};
+    
 };
 
 class ClassDecl : public Decl 

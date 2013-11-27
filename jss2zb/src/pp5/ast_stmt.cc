@@ -24,25 +24,35 @@ void Program::Emit()
 
   for(int i = 0; i < decls->NumElements();i++)
     {
-      if(!decls->Nth(i)->IsFunction())
+      if(decls->Nth(i)->IsVarDecl())
         {
 	  decls->Nth(i)->Emit(cg);
         }
     }
-
+  
   for(int i = 0; i < decls->NumElements();i++)
     {
       if(strcmp(decls->Nth(i)->GetName()->GetName(),"main") == 0)
 	{
 	  error = true;
+          decls->Nth(i)->Emit(scope,cg);
 	}
-      (decls->Nth(i))->Emit(scope,cg);
     }
+
+  for(int i = 0; i < decls->NumElements();i++)
+    {
+      if(strcmp(decls->Nth(i)->GetName()->GetName(),"main") != 0)
+        {
+          decls->Nth(i)->Emit(scope,cg);
+        }
+    }
+
   
   if(!error)
     {
       ReportError::NoMainFound();
     }
+  cg->DoFinalCodeGen();
 }
 
 void Program::Build() 
@@ -216,6 +226,14 @@ void ReturnStmt::Build(Tree *tree)
 
 Location* ReturnStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
+  if(expr)
+    {
+    cg->GenReturn(expr->Emit(tree,cg));
+    }
+  else
+    {
+    cg->GenReturn();
+    }
   return NULL;
 }
 

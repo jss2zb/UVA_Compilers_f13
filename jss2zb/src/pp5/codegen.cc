@@ -56,6 +56,12 @@ Location* CodeGenerator::GenGlobVar(const char *s)
   nextGlobalNum++;
   return loc;
 }
+
+Location* CodeGenerator::GenParam(const char *s,int i)
+{
+  Location *loc = new Location(fpRelative,OffsetToFirstParam + (VarSize * i),s);
+  return loc;
+}
  
 Location *CodeGenerator::GenLoadConstant(int value)
 {
