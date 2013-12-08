@@ -24,6 +24,9 @@ class Expr : public Stmt
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
   virtual Type* GetType(Tree *tree) {return new Type("error");}
+  virtual bool IsArray() {return false;}
+  virtual bool IsField() {return false;}
+  virtual Identifier* GetName() {return NULL;}
     //    virtual void Emit(Tree *tree) {printf("error");}
 };
 
@@ -181,6 +184,7 @@ class AssignExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "AssignExpr"; }
     void Build(Tree *tree) {}
     Location* Emit(Tree *tree,CodeGenerator *cg);
+    bool IsNew() {return true;}
 };
 
 class LValue : public Expr 
@@ -214,6 +218,9 @@ class ArrayAccess : public LValue
     void Build(Tree *tree){}
     Location* Emit(Tree *tree,CodeGenerator *cg);
     Type* GetType(Tree *tree);
+    bool IsArray() {return true;};
+    //bool IsField() {return true;};
+    Identifier* GetName() {return base->GetName();};
 };
 
 /* Note that field access is used both for qualified names
@@ -234,6 +241,8 @@ class FieldAccess : public LValue
     void Build(Tree *tree) {}
     Location* Emit(Tree *tree,CodeGenerator *cg);
     Type* GetType(Tree *tree);
+    Identifier* GetName() {return field;};
+    bool IsField() {return true;};
 };
 
 /* Like field access, call is used both for qualified base.field()

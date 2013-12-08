@@ -24,7 +24,7 @@ Location* IntConstant::Emit(Tree *tree, CodeGenerator *cg)
 
 Location* NullConstant::Emit(Tree *tree, CodeGenerator *cg)
 {
-  return NULL;
+  return cg->GenLoadConstant(0);
 }
 
 Location* EmptyExpr::Emit(Tree *tree, CodeGenerator *cg)
@@ -139,40 +139,187 @@ Location* ArithmeticExpr::Emit(Tree *tree,CodeGenerator *cg)
   Location *loc;
   if(left)
     {
-      loc = cg->GenBinaryOp(op->GetName(),left->Emit(tree,cg),right->Emit(tree,cg));
+      Location *le;
+      Location *ri;
+      if(left->InClass())
+	{
+	  Decl *dec;
+	  if(left->IsField())
+	    {
+	      dec = tree->Lookup(left->GetName()->GetName());
+	      if(dec->HasOffset())
+		{
+		  le = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+		}
+	      else
+		{
+		  le = left->Emit(tree,cg);
+		}
+	    }
+	  else
+	    {
+	      le = left->Emit(tree,cg);
+	    }
+
+	  if(right->IsField())
+	    {
+	      dec = tree->Lookup(right->GetName()->GetName());
+	      if(dec->HasOffset())
+		{
+		  ri = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+		}
+	      else
+		{
+		  ri = right->Emit(tree,cg);
+		}
+	    }
+	  else
+	    {
+	      ri = right->Emit(tree,cg);
+	    }
+	}
+      else
+	{
+	  le = left->Emit(tree,cg);
+	  ri = right->Emit(tree,cg);
+	  
+	}
+      loc = cg->GenBinaryOp(op->GetName(),le,ri);
     }
   else
     {
-      loc = cg->GenBinaryOp("-",cg->GenLoadConstant(0),right->Emit(tree,cg));
+      Location *ri;
+      if(right->InClass())
+	{
+	  if(right->IsField())
+	    {
+	      Decl *dec = tree->Lookup(right->GetName()->GetName());
+	      if(dec->HasOffset())
+		{
+		  ri = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+		}
+	      else
+		{
+		  ri = right->Emit(tree,cg);
+		}
+	    }
+	  else
+	    {
+	      ri = right->Emit(tree,cg);
+	    }
+	}
+      else
+	{
+	  ri = right->Emit(tree,cg);
+	}
+loc = cg->GenBinaryOp("-",cg->GenLoadConstant(0),ri);
     }
 return loc;
 }
 
 Location* AssignExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
-  cg->GenAssign(left->Emit(tree,cg),right->Emit(tree,cg));
+  Location *le = left->Emit(tree,cg);
+  Location *ri = right->Emit(tree,cg);
+  if(left->IsArray())
+    {
+      cg->GenStore(le,ri);
+    }
+  else if(left->InClass() && left->IsField())
+    {
+      Decl *dec = tree->Lookup(left->GetName()->GetName());
+      /*      if(right->IsField())
+	{
+	  Decl *mydec = tree->Lookup(right->GetName()->GetName());
+	  if(dec->HasOffset())
+	    {
+	      ri = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+	    }
+	    }*/
+      
+      if(dec->HasOffset())
+	{
+	  cg->GenStore(CodeGenerator::ThisPtr,ri,dec->GetOffset());
+	}
+      else 
+	{
+	  cg->GenAssign(le,ri);
+	}
+    }
+  else
+    {
+      cg->GenAssign(le,ri);
+    }
   return NULL;
 }
 
 Location* RelationalExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
+  Location *le;
+  Location *ri;
+  if(this->InClass())
+    {
+      if(left->IsField())
+	{
+	  Decl *dec = tree->Lookup(left->GetName()->GetName());
+	  if(dec->HasOffset())
+	    {
+	      le = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+	    }
+	  else
+	    {
+	      le = left->Emit(tree,cg);
+	    }
+	}
+      else
+	{
+	  le = left->Emit(tree,cg);
+	}
+
+      if(right->IsField())
+	{
+	  Decl *dec = tree->Lookup(right->GetName()->GetName());
+          if(dec->HasOffset())
+            {
+              le = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+            }
+          else
+            {
+              ri = right->Emit(tree,cg);
+            }
+	}
+      else
+	{
+	  ri = right->Emit(tree,cg);
+	}
+    }
+  else
+    {
+      le = left->Emit(tree,cg);
+      ri = right->Emit(tree,cg);
+    }
+  
+  le = left->Emit(tree,cg);
+  ri = right->Emit(tree,cg);
+  
   if(strcmp(op->GetName(),"<=") == 0)
     {
-      Location *l = cg->GenBinaryOp("<",left->Emit(tree,cg),right->Emit(tree,cg));
-      Location *r = cg->GenBinaryOp("==",left->Emit(tree,cg),right->Emit(tree,cg));
+      Location *l = cg->GenBinaryOp("<",le,ri);
+      Location *r = cg->GenBinaryOp("==",le,ri);
       return cg->GenBinaryOp("||",l,r);
     }
   else if(strcmp(op->GetName(),">") == 0)
     {
-      return cg->GenBinaryOp("<",right->Emit(tree,cg),left->Emit(tree,cg));
+      return cg->GenBinaryOp("<",ri,le);
     }
   else if(strcmp(op->GetName(),">=") == 0)
     {
-      Location *l = cg->GenBinaryOp("<",right->Emit(tree,cg),left->Emit(tree,cg));
-      Location *r = cg->GenBinaryOp("==",left->Emit(tree,cg),right->Emit(tree,cg));
+      Location *l = cg->GenBinaryOp("<",ri,le);
+      Location *r = cg->GenBinaryOp("==",le,ri);
       return cg->GenBinaryOp("||",l,r);
     }
-  return cg->GenBinaryOp(op->GetName(),left->Emit(tree,cg),right->Emit(tree,cg));
+  Location *locate = cg->GenBinaryOp(op->GetName(),le,ri);
+  return locate;
 }
 
 Type* RelationalExpr::GetType(Tree *tree)
@@ -184,7 +331,45 @@ Location* LogicalExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
   if(left)
     {
-      return cg->GenBinaryOp(op->GetName(),left->Emit(tree,cg),right->Emit(tree,cg));
+      Location *le;
+      Location *ri;
+
+      if(this->InClass())
+	{
+	  if(left->IsField())
+	    {
+	      Decl *dec = tree->Lookup(left->GetName()->GetName());
+	      if(dec->HasOffset())
+		{
+		  le = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+		}
+	      else
+		{
+		  le = left->Emit(tree,cg);
+		}
+	    }
+	  
+	  if(right->IsField())
+	    {
+	      Decl *dec = tree->Lookup(right->GetName()->GetName());
+              if(dec->HasOffset())
+                {
+                  ri = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+                }
+              else
+                {
+                  ri = left->Emit(tree,cg);
+                }
+
+	    }
+	}
+      else
+	{
+	  le = left->Emit(tree,cg);
+	  ri = right->Emit(tree,cg);
+	}
+      
+      return cg->GenBinaryOp(op->GetName(),le,ri);
     }
   else
     {
@@ -225,7 +410,6 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     if (base) base->SetParent(this); 
     (field=f)->SetParent(this);
 }
-
   void FieldAccess::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
     field->Print(indentLevel+1);
@@ -242,17 +426,28 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
 Location* Call::Emit(Tree *tree,CodeGenerator *cg)
 {
   Location *loc;
-  if(base == NULL)
+  if(base == NULL && !this->InClass())
     {
-      for(int i = actuals->NumElements()-1; i >= 0; i--)
-	{
-	  cg->GenPushParam(actuals->Nth(i)->Emit(tree,cg));
-	}
       bool hasReturn = true;
       if(strcmp(tree->Lookup(field->GetName())->GetType()->GetIdentifier()->GetName(),"void") == 0)
 	{
 	  hasReturn = false;
 	}
+      
+      List<Location*> *lactuals = new List<Location*>();
+      
+      for(int i = 0; i < actuals->NumElements(); i++)
+	{
+	  lactuals->Append(actuals->Nth(i)->Emit(tree,cg));
+	}
+      
+      int n = actuals->NumElements();
+	  
+      for(int i = 0; i < actuals->NumElements(); i++)
+	{
+	  cg->GenPushParam(lactuals->Nth(n-i-1));
+	}
+
       const char *c = "_";
       size_t len1 = strlen(c);
       size_t len2 = strlen(field->GetName());
@@ -263,6 +458,97 @@ Location* Call::Emit(Tree *tree,CodeGenerator *cg)
       loc = cg->GenLCall(f,hasReturn);
       cg->GenPopParams(4*actuals->NumElements());
     }
+  else if(strcmp(field->GetName(),"length") == 0)
+    {
+      loc = cg->GenLoad(base->Emit(tree,cg),-4);
+    }
+else if(base == NULL)
+    {
+      bool hasReturn = true;
+      Decl *classDecl = tree->Lookup(this->GetClass()->GetIdentifier()->GetName());
+      Tree *myTree = classDecl->GetScope();
+      if(strcmp(myTree->Lookup(field->GetName())->GetType()->GetIdentifier()->GetName(),"void") == 0)
+        {
+          hasReturn = false;
+        }
+      List<Decl*> *members = classDecl->GetMembers();
+      int offset = 0;
+      for(int i = 0; i < members->NumElements(); i++)
+        {
+          if(members->Nth(i)->IsFunction())
+            {
+              if((strcmp(members->Nth(i)->GetName()->GetName(),field->GetName()) == 0) && (members->Nth(i)->GetFormals()->NumElements() == actuals->NumElements()))
+                {
+                  break;
+                }
+              else
+                {
+                  offset++;
+                }
+            }
+        }
+      
+      List<Location*> *lactuals = new List<Location*>();
+      for(int i = 0; i < actuals->NumElements(); i++)
+        {
+          lactuals->Append(actuals->Nth(i)->Emit(tree,cg));
+        }
+      Location *b = cg->GenLoad(CodeGenerator::ThisPtr);
+      Location *c = cg->GenLoad(b,offset*4);
+      int n = actuals->NumElements();
+
+      for(int i = 0; i < actuals->NumElements(); i++)
+        {
+          cg->GenPushParam(lactuals->Nth(n-i-1));
+        }
+      cg->GenPushParam(CodeGenerator::ThisPtr);
+      loc = cg->GenACall(c,hasReturn);
+      cg->GenPopParams(4*(n+1));
+    }
+  else 
+    {
+      bool hasReturn = true;
+      Decl *classDecl = tree->Lookup(base->GetType(tree)->GetIdentifier()->GetName());
+      Tree *myTree = classDecl->GetScope();
+      if(strcmp(myTree->Lookup(field->GetName())->GetType()->GetIdentifier()->GetName(),"void") == 0)
+        {
+          hasReturn = false;
+        }
+      List<Decl*> *members = classDecl->GetMembers();
+      int offset = 0;
+      for(int i = 0; i < members->NumElements(); i++)
+	{
+	  if(members->Nth(i)->IsFunction())
+	    {
+	      if((strcmp(members->Nth(i)->GetName()->GetName(),field->GetName()) == 0) && (members->Nth(i)->GetFormals()->NumElements() == actuals->NumElements()))
+		{
+		  break;
+		}
+	      else
+		{
+		  offset++;
+		}
+	    }
+	}
+     
+      List<Location*> *lactuals = new List<Location*>();
+      for(int i = 0; i < actuals->NumElements(); i++)
+        {
+          lactuals->Append(actuals->Nth(i)->Emit(tree,cg));
+        }
+      Location *b = cg->GenLoad(base->Emit(tree, cg));
+      Location *c = cg->GenLoad(b,offset*4);
+      int n = actuals->NumElements();
+
+      for(int i = 0; i < actuals->NumElements(); i++)
+        {
+          cg->GenPushParam(lactuals->Nth(n-i-1));
+        }
+      cg->GenPushParam(base->Emit(tree,cg));
+      loc = cg->GenACall(c,hasReturn);
+      cg->GenPopParams(4*(n+1));
+    }
+
   return loc;
 }
 
@@ -327,7 +613,16 @@ void NewArrayExpr::PrintChildren(int indentLevel) {
 
 Location* FieldAccess::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return tree->Lookup(field->GetName())->GetLabel();
+  /*  if(this->InClass())
+    {
+      Decl *dec = tree->Lookup(field->GetName());
+      if(dec->HasOffset())
+	{
+	  Location *locate = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+	  return locate;
+	}
+	}*/
+    return tree->Lookup(field->GetName())->GetLabel();
 }
 
 Type* FieldAccess::GetType(Tree *tree)
@@ -351,7 +646,40 @@ Type* FieldAccess::GetType(Tree *tree)
 
 Location* ArrayAccess::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return NULL;
+  Location *baseLocation;
+
+  if(this->InClass() && base->IsField())
+    {
+      Decl *myDecl = tree->Lookup(base->GetName()->GetName());
+      baseLocation = cg->GenLoad(CodeGenerator::ThisPtr,myDecl->GetOffset());
+    }
+  else
+    {
+      baseLocation = base->Emit(tree,cg);
+    }
+
+  Location *loc = subscript->Emit(tree,cg);
+  char *eLabel = cg->NewLabel();
+  Location *zer = cg->GenLoadConstant(0);
+  Location *res = cg->GenBinaryOp("<",loc,zer);
+  Location *tes = cg->GenLoad(baseLocation,-4);
+
+  Location *res2 = cg->GenBinaryOp("<",loc,tes);
+  Location *res3 = cg->GenBinaryOp("==",res2,zer);
+  Location *fin = cg->GenBinaryOp("||",res,res3);
+  cg->GenIfZ(fin,eLabel);
+  Location *mes = cg->GenLoadConstant("Decaf runtime error: Array subscript out of bounds\\n");
+  cg->GenBuiltInCall(PrintString,mes);
+  cg->GenBuiltInCall(Halt);
+  cg->GenLabel(eLabel);
+  Location *temp = cg->GenLoadConstant(4);
+  Location *atemp = cg->GenBinaryOp("*",temp,loc);
+  Location *array = cg->GenBinaryOp("+",baseLocation,atemp);
+  if(strcmp(parent->GetPrintNameForNode(),"AssignExpr") == 0)
+    {
+      return array;
+    }
+  return cg->GenLoad(array);
 }
 
 Type* ArrayAccess::GetType(Tree *tree)
@@ -361,7 +689,23 @@ Type* ArrayAccess::GetType(Tree *tree)
 
 Location* NewArrayExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return NULL;
+  char *eLabel = cg->NewLabel();
+  Location *loc = size->Emit(tree,cg);
+  Location *zer = cg->GenLoadConstant(0);
+  Location *res = cg->GenBinaryOp("<",loc,zer);
+  cg->GenIfZ(res,eLabel);
+  Location *mes = cg->GenLoadConstant("Decaf runtime error: Array size is <= 0\\n");
+  cg->GenBuiltInCall(PrintString,mes);
+  cg->GenBuiltInCall(Halt);
+  cg->GenLabel(eLabel);
+  Location *tem1 = cg->GenLoadConstant(1);
+  Location *tem2 = cg->GenBinaryOp("+",tem1,loc);
+  Location *con = cg->GenLoadConstant(4);
+  Location *tem3 = cg->GenBinaryOp("*",tem2,con);
+  Location *arr = cg->GenBuiltInCall(Alloc,tem3);
+  cg->GenStore(arr,loc);
+  Location *ret = cg->GenBinaryOp("+",arr,con);
+  return ret;
 }
 
 Type* NewArrayExpr::GetType(Tree *tree)
@@ -371,7 +715,7 @@ Type* NewArrayExpr::GetType(Tree *tree)
 
 Location* This::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return NULL;
+  return CodeGenerator::ThisPtr;
 }
 
 Type* This::GetType(Tree *tree)
@@ -437,7 +781,13 @@ Type* EqualityExpr::GetType(Tree *tree)
 
 Location* NewExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
-  return NULL;
+  Decl *d = tree->Lookup(cType->GetIdentifier()->GetName());
+  int num = d->GetMemberBytes();
+  Location *mBytes = cg->GenLoadConstant(num);
+  Location *res = cg->GenBuiltInCall(Alloc,mBytes);
+  Location *res2 = cg->GenLoadLabel(cType->GetIdentifier()->GetName());
+  cg->GenStore(res,res2);
+  return res;
 }
 
 Type* NewExpr::GetType(Tree *tree)
@@ -447,11 +797,13 @@ Type* NewExpr::GetType(Tree *tree)
 
 Location* ReadIntegerExpr::Emit(Tree *tree, CodeGenerator *cg)
 {
-  return NULL;
+  Location *loc = cg->GenBuiltInCall(ReadInteger);
+  return loc;
 }
 
 Location* ReadLineExpr::Emit(Tree *tree, CodeGenerator *cg)
 {
-  return NULL;
+  Location *loc = cg->GenBuiltInCall(ReadLine);
+  return loc;
 }
 

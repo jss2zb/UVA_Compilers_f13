@@ -30,14 +30,19 @@ int CodeGenerator::GetLocalCount()
   return nextLocalNum;
 }
 
+void CodeGenerator::SetLocalCount()
+{
+  nextLocalNum = 0;
+}
+
 Location *CodeGenerator::GenTempVar()
 {
   static int nextTempNum;
   char temp[10];
   Location *result = NULL;
   sprintf(temp, "_tmp%d", nextTempNum++);
-  nextLocalNum++;
   result = new Location(fpRelative,OffsetToFirstLocal - (VarSize * nextLocalNum),temp);
+  nextLocalNum++;
   Assert(result != NULL);
   return result;
 }
@@ -45,19 +50,19 @@ Location *CodeGenerator::GenTempVar()
 Location* CodeGenerator::GenLocVar(const char *s)
 {
   Location *loc = new Location(fpRelative,OffsetToFirstLocal - (VarSize * nextLocalNum),s);
-  nextLocalNum++;
+  nextLocalNum++;  
   return loc;
 }
 
 Location* CodeGenerator::GenGlobVar(const char *s)
 {
   static int nextGlobalNum;
-  Location *loc = new Location(gpRelative,OffsetToFirstGlobal + (VarSize * nextGlobalNum),s);
   nextGlobalNum++;
+  Location *loc = new Location(gpRelative,OffsetToFirstGlobal + (VarSize * nextGlobalNum),s);
   return loc;
 }
 
-Location* CodeGenerator::GenParam(const char *s,int i)
+Location* CodeGenerator::GenParam(const char *s, int i)
 {
   Location *loc = new Location(fpRelative,OffsetToFirstParam + (VarSize * i),s);
   return loc;

@@ -1,4 +1,5 @@
-class Squash extends Vegetable {
+class Squash extends Vegetable 
+{
    void Grow(Seeds []seeds, int [][]water)
    {
       Print("But I don't like squash\n");
@@ -9,7 +10,6 @@ class Squash extends Vegetable {
 class Vegetable {
     int weight;
     int color;
-
 
     void Eat(Vegetable veg)
     {
@@ -27,7 +27,6 @@ class Vegetable {
       Eat(this);
    }
 }
-
 
 void Grow(int a) {
    Print("mmm... veggies!\n");

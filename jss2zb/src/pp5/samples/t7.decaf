@@ -6,7 +6,7 @@ class Animal {
   int height;
   Animal mother;
   void InitAnimal(int h, Animal mom) {
-    this.height = h;
+    height = h;
     mother = mom;
   }
 
@@ -21,6 +21,7 @@ class Animal {
 
 class Cow extends Animal {
   bool isSpotted;
+
   void InitCow(int h, Animal m, bool spot) {
     isSpotted = spot;
     InitAnimal(h,m);

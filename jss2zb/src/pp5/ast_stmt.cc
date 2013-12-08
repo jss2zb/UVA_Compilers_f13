@@ -35,18 +35,13 @@ void Program::Emit()
       if(strcmp(decls->Nth(i)->GetName()->GetName(),"main") == 0)
 	{
 	  error = true;
-          decls->Nth(i)->Emit(scope,cg);
+	}
+      
+      if(!decls->Nth(i)->IsVarDecl())
+	{
+	  decls->Nth(i)->Emit(scope,cg);
 	}
     }
-
-  for(int i = 0; i < decls->NumElements();i++)
-    {
-      if(strcmp(decls->Nth(i)->GetName()->GetName(),"main") != 0)
-        {
-          decls->Nth(i)->Emit(scope,cg);
-        }
-    }
-
   
   if(!error)
     {
@@ -228,11 +223,27 @@ Location* ReturnStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
   if(expr)
     {
-    cg->GenReturn(expr->Emit(tree,cg));
+      if(this->InClass() && expr->IsField())
+	{
+	  Decl *dec = tree->Lookup(expr->GetName()->GetName());
+	  if(dec->HasOffset())
+	    {
+	      Location *locate = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+	      cg->GenReturn(locate);
+	    }
+	  else
+	    {
+	      cg->GenReturn(expr->Emit(tree,cg));
+	    }
+	}
+      else
+	{
+	  cg->GenReturn(expr->Emit(tree,cg));
+	}
     }
   else
     {
-    cg->GenReturn();
+      cg->GenReturn();
     }
   return NULL;
 }
@@ -256,19 +267,37 @@ void PrintStmt::Build(Tree *tree)
 
 Location* PrintStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
-  for(int i=0; i < args->NumElements(); i++)
+  for(int i = 0; i < args->NumElements(); i++)
     {
-      if(strcmp(args->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),"int") == 0)
+      Location *theLoc;
+      if(args->Nth(i)->IsField())
 	{
-	  cg->GenBuiltInCall(PrintInt,args->Nth(i)->Emit(tree,cg));
-	}
-      else if(strcmp(args->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),"bool") == 0)
-	{
-	  cg->GenBuiltInCall(PrintBool,args->Nth(i)->Emit(tree,cg));
+	  Decl *dec = tree->Lookup(args->Nth(i)->GetName()->GetName());
+	  if(dec->HasOffset())
+	    {
+	      theLoc = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+	    }
+	  else
+	    {
+	      theLoc = args->Nth(i)->Emit(tree,cg);
+	    }
 	}
       else
 	{
-	  cg->GenBuiltInCall(PrintString,args->Nth(i)->Emit(tree,cg));
+	      theLoc = args->Nth(i)->Emit(tree,cg);
+	}
+     
+      if(strcmp(args->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),"int") == 0)
+	{
+	  cg->GenBuiltInCall(PrintInt,theLoc);
+	}
+      else if(strcmp(args->Nth(i)->GetType(tree)->GetIdentifier()->GetName(),"bool") == 0)
+	{
+	  cg->GenBuiltInCall(PrintBool,theLoc);
+	}
+      else
+	{
+	  cg->GenBuiltInCall(PrintString,theLoc);
 	}
     }
   return NULL;

@@ -90,6 +90,15 @@ class Node
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
+    virtual bool IsAssign() {return false;}
+    virtual bool InClass()
+    {
+      if(parent)
+	{
+	  return parent->InClass();
+	}
+      return false;
+    }
     virtual bool IsInLoop() 
     {
       if(parent)
@@ -112,7 +121,7 @@ class Node
     {
       if(parent)
 	{
-	  parent->GetClass();
+	  return parent->GetClass();
 	}
       return NULL;
     }

@@ -43,6 +43,10 @@ class Decl : public Node
     virtual bool IsVarDecl() {return false;}
     virtual Location* GetLabel() {return NULL;}
     virtual Location* Emit(CodeGenerator *cg) {return NULL;}
+    virtual int GetMemberBytes() {return 0;}
+    virtual int GetOffset() {return 0;}
+    virtual bool HasOffset() {return false;}
+    virtual void SetOffset(int x) {}
 };
 
 class VarDecl : public Decl 
@@ -50,6 +54,8 @@ class VarDecl : public Decl
   protected:
     Type *type;
     Location *label;
+    int offset;
+    bool inClass;
 
   public:
     VarDecl(Identifier *name, Type *type);
@@ -66,6 +72,9 @@ class VarDecl : public Decl
     bool hasMembers(Identifier *id) {return false;};
     bool IsVarDecl() {return true;};
     Location* GetLabel() {return label;};
+    void SetOffset(int x) {inClass = true; offset = x;};
+    bool HasOffset() {return inClass;};
+    int GetOffset() {return offset;};
     
 };
 
@@ -73,6 +82,7 @@ class ClassDecl : public Decl
 {
   protected:
     List<Decl*> *members;
+    List<Decl*> *ExtendMembers;
     NamedType *extends;
     List<NamedType*> *implements;
     Tree *scope;
@@ -86,10 +96,12 @@ class ClassDecl : public Decl
     void Build(Tree *tree);
     Location* Emit(Tree *tree,CodeGenerator *cg);
     Tree* GetScope() {return scope;};
-    Type* GetClass() {return new Type(id->GetName());}
+    Type* GetClass() {return new Type(id->GetName());};
     bool hasMembers(Identifier *id);
-    List<Decl*>* GetMembers(){return members;};
+    List<Decl*>* GetMembers();
     bool IsClass() {return true;};
+    bool InClass() {return true;};
+    int GetMemberBytes();
 };
 
 class InterfaceDecl : public Decl 

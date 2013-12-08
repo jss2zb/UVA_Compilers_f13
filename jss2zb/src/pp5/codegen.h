@@ -51,7 +51,8 @@ class CodeGenerator {
          // generate any Tac instructions (see GenLabel below if needed)
     char *NewLabel();
     int GetLocalCount();
-
+    void SetLocalCount();
+    void SetThis(Location *loc) {ThisPtr = loc;};
     
          // Creates and returns a Location for a new uniquely named
          // temp variable. Does not generate any Tac instructions
