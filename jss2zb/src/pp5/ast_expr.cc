@@ -668,7 +668,16 @@ Location* ArrayAccess::Emit(Tree *tree,CodeGenerator *cg)
       baseLocation = base->Emit(tree,cg);
     }
 
-  Location *loc = subscript->Emit(tree,cg);
+  Location *loc;
+  if(this->InClass() && subscript->IsField())
+    {
+      Decl *myDecl = tree->Lookup(subscript->GetName()->GetName());
+      loc = cg->GenLoad(CodeGenerator::ThisPtr,myDecl->GetOffset());
+    }
+  else
+    {
+      loc = subscript->Emit(tree,cg);
+    }
   char *eLabel = cg->NewLabel();
   Location *zer = cg->GenLoadConstant(0);
   Location *res = cg->GenBinaryOp("<",loc,zer);
