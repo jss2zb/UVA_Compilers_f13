@@ -135,13 +135,14 @@ Location* ForStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
   init->Emit(scope,cg);
   char *tlabel = cg->NewLabel();
-  char *elabel = cg->NewLabel();
-  label = elabel;
   cg->GenLabel(tlabel);
+  char *elabel = cg->NewLabel();
   cg->GenIfZ(test->Emit(scope,cg),elabel);
   body->Emit(scope,cg);
   step->Emit(scope,cg);
   cg->GenGoto(tlabel);
+
+  label = elabel;
   cg->GenLabel(elabel);
   return NULL;
 }
@@ -162,12 +163,12 @@ void WhileStmt::Build(Tree *tree)
 Location* WhileStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
   char *tlabel = cg->NewLabel();
-  char *elabel = cg->NewLabel();
-  label = elabel;
   cg->GenLabel(tlabel);
+  char *elabel = cg->NewLabel();
   cg->GenIfZ(test->Emit(tree,cg),elabel);
   body->Emit(tree,cg);
   cg->GenGoto(tlabel);
+  label = elabel;
   cg->GenLabel(elabel);
   return NULL;
 }
@@ -194,17 +195,19 @@ Location* IfStmt::Emit(Tree *tree,CodeGenerator *cg)
 {
   char *eLabel = cg->NewLabel();
   cg->GenIfZ(test->Emit(tree,cg),eLabel);
-  char *tLabel = cg->NewLabel();  
   body->Emit(tree,cg);
   if(elseBody)
     {
+      char *tLabel = cg->NewLabel();  
       cg->GenGoto(tLabel);
       cg->GenLabel(eLabel);
       elseBody->Emit(tree,cg);
       cg->GenLabel(tLabel);
     }
   else
-    cg->GenLabel(eLabel);
+    {
+      cg->GenLabel(eLabel);
+    }
   return NULL;
 }
 

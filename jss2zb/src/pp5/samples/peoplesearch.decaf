@@ -77,7 +77,8 @@ class Database{
 		name = ReadLine();
 		found = false;
 		for(i = 0; i < currentSize; i = i + 1){
-			if(people[i].IsNamed(name)){
+			if(people[i].IsNamed(name))
+			{
 				if(!found){
 					found = true;
 					Print("\nListing people with name '", name, "'...\n");
