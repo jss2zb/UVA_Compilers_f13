@@ -221,6 +221,11 @@ Location* AssignExpr::Emit(Tree *tree,CodeGenerator *cg)
 {
   Location *le = left->Emit(tree,cg);
   Location *ri = right->Emit(tree,cg);
+  if(right->IsArray())
+    {
+      ri = cg->GenLoad(ri);
+    }
+
   if(left->IsArray())
     {
       cg->GenStore(le,ri);
@@ -281,7 +286,7 @@ Location* RelationalExpr::Emit(Tree *tree,CodeGenerator *cg)
 	  Decl *dec = tree->Lookup(right->GetName()->GetName());
           if(dec->HasOffset())
             {
-              le = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
+              ri = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
             }
           else
             {
@@ -298,10 +303,7 @@ Location* RelationalExpr::Emit(Tree *tree,CodeGenerator *cg)
       le = left->Emit(tree,cg);
       ri = right->Emit(tree,cg);
     }
-  
-  le = left->Emit(tree,cg);
-  ri = right->Emit(tree,cg);
-  
+    
   if(strcmp(op->GetName(),"<=") == 0)
     {
       Location *l = cg->GenBinaryOp("<",le,ri);
@@ -460,6 +462,23 @@ Location* Call::Emit(Tree *tree,CodeGenerator *cg)
     }
   else if(strcmp(field->GetName(),"length") == 0)
     {
+      /*Location *local;
+      if(this->InClass())
+	{
+	  Decl *classDecl = tree->Lookup(base->GetName()->GetName());
+	  if(classDecl->HasOffset())
+	    {
+	      local = cg->GenLoad(CodeGenerator::ThisPtr,classDecl->GetOffset());
+	    }
+	  else
+	    {
+	      local = base->Emit(tree,cg);
+	    }
+	}
+      else
+	{
+	  local = base->Emit(tree,cg);
+	  }*/
       loc = cg->GenLoad(base->Emit(tree,cg),-4);
     }
 else if(base == NULL)
@@ -613,15 +632,6 @@ void NewArrayExpr::PrintChildren(int indentLevel) {
 
 Location* FieldAccess::Emit(Tree *tree,CodeGenerator *cg)
 {
-  /*  if(this->InClass())
-    {
-      Decl *dec = tree->Lookup(field->GetName());
-      if(dec->HasOffset())
-	{
-	  Location *locate = cg->GenLoad(CodeGenerator::ThisPtr,dec->GetOffset());
-	  return locate;
-	}
-	}*/
     return tree->Lookup(field->GetName())->GetLabel();
 }
 

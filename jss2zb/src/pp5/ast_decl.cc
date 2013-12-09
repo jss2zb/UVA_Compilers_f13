@@ -91,22 +91,26 @@ void ClassDecl::Build(Tree *tree)
           for(int i = 0; i < t->NumElements();i++)
             {
 	      t->Nth(i)->Build(tree);
-	      /*              bool there = false;
+	      bool there = false;
               for(int j = 0; j < members->NumElements(); j++)
                 {
-                  if(strcmp(t->Nth(i)->GetName()->GetName(),members->Nth(j)->GetName()->GetName()) == 0)
-                    {
-                      there = true;
-                    }
+                  if(t->Nth(i)->IsFunction())
+		    {
+		      if(strcmp(t->Nth(i)->GetName()->GetName(),members->Nth(j)->GetName()->GetName()) == 0)
+			{
+			  there = true;
+			}
+		    }
                 }
-              if(!there)
+              
+	      if(!there)
                 {
                   ExtendMembers->Append(t->Nth(i));
-		  }*/
+		}
             }
         }
     }
-    
+  
   scope = theTree;
   tree->InsertChild(theTree);
 }
@@ -127,6 +131,13 @@ Location* ClassDecl::Emit(Tree *tree,CodeGenerator *cg)
 		  if(strcmp(t->Nth(i)->GetName()->GetName(),members->Nth(j)->GetName()->GetName()) == 0)
 		    {
 		      there = true;
+		    }
+		  for(int k = 0; k < ExtendMembers->NumElements(); k++)
+		    {
+		      if(strcmp(t->Nth(i)->GetName()->GetName(),ExtendMembers->Nth(k)->GetName()->GetName()) == 0)
+			{
+			  there = true;
+			}
 		    }
 		}
 	      if(!there)
@@ -233,6 +244,7 @@ int ClassDecl::GetMemberBytes()
   int Vtable = 0;
   for(int i = 0; i < members->NumElements(); i++)
     {
+      //      printf("%s\n",members->Nth(i)->GetName()->GetName());
       if(members->Nth(i)->IsVarDecl())
 	{
 	  count++;
@@ -244,6 +256,7 @@ int ClassDecl::GetMemberBytes()
     }
   for(int i = 0; i < ExtendMembers->NumElements(); i++)
     {
+      //      printf("%s\n",ExtendMembers->Nth(i)->GetName()->GetName());
       if(ExtendMembers->Nth(i)->IsVarDecl())
 	{
 	  count++;
@@ -253,7 +266,6 @@ int ClassDecl::GetMemberBytes()
 	  Vtable = 1;
 	}
     }
-  
   return 4 * (count + Vtable);
 }
 
